@@ -34,6 +34,16 @@ create table if not exists settings (
   live_url text,          -- URL de YouTube (video en vivo o canal)
   updated_at timestamptz default now()
 );
+-- Marca y "Quién soy" (editables desde Panel → Ajustes)
+alter table settings add column if not exists color_primary text default '#0b2540';
+alter table settings add column if not exists color_accent text default '#ff5a36';
+alter table settings add column if not exists logo_url text;
+alter table settings add column if not exists about_title text default 'Quién soy';
+alter table settings add column if not exists about_photo_url text;
+alter table settings add column if not exists about_tags text default 'Competencias de SUP, Eventos, Transmisiones en vivo';
+alter table settings add column if not exists about_text text default
+  E'Soy fotógrafo independiente. Recorro las competencias de stand up paddle para que cada remador tenga sus mejores fotos, y también cubro eventos sociales y deportivos.\n\nAdemás transmito en vivo las competencias, para que familia y amigos las sigan desde donde estén.\n\nSi querés que cubra tu evento, escribime y lo charlamos.';
+
 insert into settings (id, site_name, watermark_text, instagram)
 values (1, 'M.A.R Fotografía', '@m.a.r_fotografia', 'm.a.r_fotografia')
 on conflict do nothing;

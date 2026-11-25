@@ -8,7 +8,7 @@
 <style>
 :root{
   --bg:#f4f6f8;--card:#fff;--ink:#0b1b2b;--muted:#5d6d7e;--line:#e1e6eb;
-  --brand:#0b2540;--brand2:#0f6fb8;--accent:#ff5a36;--accent-ink:#fff;
+  --brand:#0b2540;--brand-ink:#fff;--brand2:#0b2540;--accent:#ff5a36;--accent-ink:#fff;
   --ok:#11875a;--okbg:#e5f5ee;--warn:#9a6a00;--warnbg:#fff4d6;--bad:#c22f2f;--badbg:#fdeaea;
   --r:14px;--shadow:0 1px 2px rgba(11,27,43,.06),0 4px 16px rgba(11,27,43,.06);
 }
@@ -19,7 +19,7 @@ a{color:var(--brand2)}
 img{display:block;max-width:100%}
 .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
 button,input,select,textarea{font:inherit;color:inherit}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:11px 16px;font-weight:650;cursor:pointer;background:var(--brand);color:#fff;text-decoration:none;line-height:1.2;min-height:44px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:11px 16px;font-weight:650;cursor:pointer;background:var(--brand);color:var(--brand-ink);text-decoration:none;line-height:1.2;min-height:44px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn.accent{background:var(--accent);color:var(--accent-ink)}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
@@ -42,24 +42,27 @@ h1,h2,h3{line-height:1.15;margin:0 0 10px;letter-spacing:-.01em}
 .hidden{display:none!important}
 
 /* header */
-.demo-strip{background:#fff4d6;color:#6b4a00;font-size:12.5px;text-align:center;padding:6px 12px}
-header.top{position:sticky;top:0;z-index:30;background:rgba(11,37,64,.97);color:#fff;backdrop-filter:blur(8px)}
+header.top{position:sticky;top:0;z-index:30;background:var(--brand);color:var(--brand-ink)}
 header.top .wrap{display:flex;align-items:center;gap:14px;height:58px}
-.logo{font-weight:800;font-size:18px;color:#fff;text-decoration:none;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo{display:flex;align-items:center;gap:9px;min-width:0;font-weight:800;font-size:18px;color:var(--brand-ink);text-decoration:none;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo img{height:36px;width:auto;max-width:110px;object-fit:contain;flex:none}
+.logo span{overflow:hidden;text-overflow:ellipsis}
+@media(max-width:600px){.logo img+span{display:none}}
 .logo b{color:var(--accent)}
 nav.main{display:flex;gap:4px;margin-left:auto}
-nav.main a{color:#cfe0f1;text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
-nav.main a.on,nav.main a:hover{color:#fff;background:rgba(255,255,255,.1)}
+nav.main a{color:color-mix(in srgb,var(--brand-ink) 78%,transparent);text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+nav.main a.on,nav.main a:hover{color:var(--brand-ink);background:color-mix(in srgb,var(--brand-ink) 12%,transparent)}
 .dot{width:8px;height:8px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 0 0 rgba(255,59,59,.7);animation:pulse 1.6s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(255,59,59,0)}100%{box-shadow:0 0 0 0 rgba(255,59,59,0)}}
-.cart-pill{background:var(--accent);color:#fff!important;border-radius:999px!important;padding:6px 12px!important}
+.cart-pill{background:var(--accent);color:var(--accent-ink)!important;border-radius:999px!important;padding:6px 12px!important}
 @media(max-width:600px){nav.main a .lbl{display:none} nav.main a{padding:8px}}
 
 /* hero */
-.hero{background:linear-gradient(160deg,#0b2540 0%,#0f4d82 55%,#1386c9 100%);color:#fff;padding:44px 0 56px;position:relative;overflow:hidden}
+.hero{background:linear-gradient(160deg,var(--brand) 0%,color-mix(in srgb,var(--brand) 72%,#fff) 100%);color:var(--brand-ink);padding:44px 0 56px;position:relative;overflow:hidden}
 .hero:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:90px;background:var(--bg);border-radius:50% 50% 0 0/100% 100% 0 0}
+.hero .hero-logo{height:84px;width:auto;max-width:240px;object-fit:contain;margin-bottom:14px}
 .hero h1{font-size:clamp(28px,6vw,46px);font-weight:850;max-width:720px}
-.hero p{color:#d5e6f6;font-size:17px;max-width:600px;margin:0 0 22px}
+.hero p{color:color-mix(in srgb,var(--brand-ink) 85%,transparent);font-size:17px;max-width:600px;margin:0 0 22px}
 .live-banner{display:flex;align-items:center;gap:12px;background:#fff;color:var(--ink);border-radius:12px;padding:12px 14px;margin-bottom:20px;max-width:560px;text-decoration:none;box-shadow:var(--shadow)}
 .live-banner b{color:#d61f1f}
 
@@ -67,12 +70,12 @@ nav.main a.on,nav.main a:hover{color:#fff;background:rgba(255,255,255,.1)}
 .section{padding:22px 0 40px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
 .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:36px}
-.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chip.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
 .events{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
 .ev{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .15s}
 .ev:hover{transform:translateY(-2px)}
 .ev .cov{aspect-ratio:3/2;background:#cfd8e1 center/cover no-repeat;position:relative}
-.ev .kind{position:absolute;top:10px;left:10px;background:rgba(11,37,64,.85);color:#fff;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.ev .kind{position:absolute;top:10px;left:10px;background:color-mix(in srgb,var(--brand) 88%,transparent);color:var(--brand-ink);font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
 .ev .bd{padding:12px 14px 14px}
 .ev h3{font-size:17px;margin:0 0 4px}
 .empty{text-align:center;padding:40px 16px;color:var(--muted)}
@@ -93,7 +96,7 @@ nav.main a.on,nav.main a:hover{color:#fff;background:rgba(255,255,255,.1)}
 .ph.on .sel{background:var(--accent);border-color:var(--accent)}
 .ph .sel svg{opacity:0}.ph.on .sel svg{opacity:1}
 .ph .bib{position:absolute;left:7px;bottom:7px;background:rgba(0,0,0,.55);color:#fff;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px}
-.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--brand);color:#fff;padding:10px 0 calc(10px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.15);transform:translateY(110%);visibility:hidden;transition:transform .2s,visibility .2s}
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--brand);color:var(--brand-ink);padding:10px 0 calc(10px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.15);transform:translateY(110%);visibility:hidden;transition:transform .2s,visibility .2s}
 .cartbar.show{transform:none;visibility:visible}
 .cartbar .wrap{display:flex;align-items:center;gap:12px}
 .pad-cart{height:80px}
@@ -135,16 +138,16 @@ nav.main a.on,nav.main a:hover{color:#fff;background:rgba(255,255,255,.1)}
 /* live */
 .player{position:relative;aspect-ratio:16/9;background:#000;border-radius:var(--r);overflow:hidden}
 .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.offair{aspect-ratio:16/9;border-radius:var(--r);background:linear-gradient(160deg,#0b2540,#0f4d82);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+.offair{aspect-ratio:16/9;border-radius:var(--r);background:linear-gradient(160deg,var(--brand),color-mix(in srgb,var(--brand) 72%,#fff));color:var(--brand-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
 .sched{list-style:none;padding:0;margin:0}
 .sched li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.sched .d{background:var(--brand);color:#fff;border-radius:10px;padding:6px 10px;text-align:center;min-width:58px;font-weight:800;line-height:1.1}
+.sched .d{background:var(--brand);color:var(--brand-ink);border-radius:10px;padding:6px 10px;text-align:center;min-width:58px;font-weight:800;line-height:1.1}
 .sched .d small{display:block;font-weight:600;font-size:11px;opacity:.8;text-transform:uppercase}
 
 /* admin */
 .tabs{display:flex;gap:6px;overflow-x:auto;margin:16px 0;padding-bottom:2px}
 .tabs button{border:0;background:#fff;border-radius:10px;padding:10px 14px;font-weight:650;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow)}
-.tabs button.on{background:var(--brand);color:#fff}
+.tabs button.on{background:var(--brand);color:var(--brand-ink)}
 .order{display:grid;grid-template-columns:1fr auto;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
 .order .thumbs{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
 .order .thumbs img{width:64px;height:43px;object-fit:cover;border-radius:5px}
@@ -167,13 +170,32 @@ nav.main a.on,nav.main a:hover{color:#fff;background:rgba(255,255,255,.1)}
 .btn.face{background:#fff;color:var(--brand);border:1px solid var(--line)}
 .switch{display:flex;align-items:center;gap:10px;font-weight:650;margin-bottom:12px;cursor:pointer}
 .switch input{width:20px;height:20px}
+.about{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:28px;align-items:center}
+@media(max-width:700px){.about{grid-template-columns:1fr;gap:18px}}
+.about .pic{width:100%;max-width:260px;aspect-ratio:4/5;object-fit:cover;border-radius:18px;box-shadow:var(--shadow)}
+.about .pic.ph{background:linear-gradient(160deg,var(--brand),var(--accent));display:flex;align-items:center;justify-content:center;color:var(--brand-ink);font-size:64px;font-weight:800}
+.about h2{font-size:clamp(24px,4.5vw,34px)}
+.about .txt p{margin:0 0 12px;max-width:62ch}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 16px}
+.tags span{background:color-mix(in srgb,var(--accent) 14%,#fff);color:color-mix(in srgb,var(--accent) 70%,#000);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:650}
+.teaser{display:flex;gap:16px;align-items:center}
+.teaser img,.teaser .ph{width:86px;height:86px;border-radius:50%;object-fit:cover;flex:none}
+.teaser .ph{background:linear-gradient(160deg,var(--brand),var(--accent));display:flex;align-items:center;justify-content:center;color:var(--brand-ink);font-weight:800;font-size:28px}
+.teaser p{margin:4px 0 8px;color:var(--muted)}
+.cta{background:var(--brand);color:var(--brand-ink);border-radius:var(--r);padding:22px;margin-top:22px}
+.cta h3{margin-bottom:6px}
+.cta p{margin:0 0 14px;opacity:.85}
+.brandprev{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.brandprev img{height:56px;width:auto;max-width:160px;object-fit:contain;background:var(--brand);padding:6px;border-radius:10px}
+.colorrow{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.colorrow label{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.colorrow input[type=color]{width:46px;height:40px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff}
 footer{padding:28px 0 36px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line);margin-top:20px}
 .spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand2);border-radius:50%;animation:sp .8s linear infinite;margin:40px auto}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div id="demoStrip" class="demo-strip hidden">Modo demo: los datos son de ejemplo y no se guardan. Configurá Supabase en <code>CONFIG</code> para usar datos reales.</div>
 <header class="top">
   <div class="wrap">
     <a href="#/" class="logo" id="logo">Fotos</a>
@@ -196,6 +218,10 @@ const CONFIG = {
 };
 
 const DEMO = !CONFIG.SUPABASE_URL;
+const ABOUT_DEFAULT = {
+  tags: 'Competencias de SUP, Eventos, Transmisiones en vivo',
+  text: 'Soy fotógrafo independiente. Recorro las competencias de stand up paddle para que cada remador tenga sus mejores fotos, y también cubro eventos sociales y deportivos.\n\nAdemás transmito en vivo las competencias, para que familia y amigos las sigan desde donde estén.\n\nSi querés que cubra tu evento, escribime y lo charlamos.'
+};
 const U = CONFIG.SUPABASE_URL.replace(/\/$/, '');
 const K = CONFIG.SUPABASE_ANON_KEY;
 
@@ -495,73 +521,30 @@ const liveApi = {
     await sb.remove('originals', [p.original_path]);
     await sb.q(`photos?id=eq.${p.id}`, { method: 'DELETE' });
   },
+  async uploadBrand(blob, kind) { const path = `brand/${kind}-${Date.now()}.${blob.type === 'image/png' ? 'png' : 'jpg'}`; await sb.upload('previews', path, blob); return sb.pub(path); },
   async saveSettings(s) { const [r] = await sb.q('settings?id=eq.1', { method: 'PATCH', body: JSON.stringify({ ...strip(s, ['id']), updated_at: new Date().toISOString() }) }); return r; },
   async addSchedule(x) { const [r] = await sb.q('live_schedule', { method: 'POST', body: JSON.stringify(x) }); return r; },
   delSchedule(id) { return sb.q(`live_schedule?id=eq.${id}`, { method: 'DELETE' }); }
 };
 
 /* =====================================================================
-   MODO DEMO (datos de ejemplo generados en canvas)
+   MODO DEMO (sin Supabase): arranca vacío y todo vive en memoria
    ===================================================================== */
-function rng(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-function drawDemo(seed, w, h, bib) {
-  const c = document.createElement('canvas'); c.width = w; c.height = h;
-  const x = c.getContext('2d'), r = rng(seed), hz = h * (.36 + r() * .12), hue = 192 + r() * 26;
-  let g = x.createLinearGradient(0, 0, 0, hz); g.addColorStop(0, `hsl(${hue},70%,60%)`); g.addColorStop(1, `hsl(${hue + 12},60%,86%)`);
-  x.fillStyle = g; x.fillRect(0, 0, w, hz);
-  x.fillStyle = `hsl(${110 + r() * 40},28%,33%)`; x.beginPath(); x.moveTo(0, hz);
-  for (let i = 0; i <= 12; i++) x.lineTo(w * i / 12, hz - h * (.015 + r() * .05)); x.lineTo(w, hz); x.fill();
-  g = x.createLinearGradient(0, hz, 0, h); g.addColorStop(0, `hsl(${hue + 4},50%,42%)`); g.addColorStop(1, `hsl(${hue + 14},62%,20%)`);
-  x.fillStyle = g; x.fillRect(0, hz, w, h - hz);
-  x.strokeStyle = 'rgba(255,255,255,.2)'; x.lineWidth = Math.max(1, w / 420);
-  for (let i = 0; i < 50; i++) { const y = hz + (h - hz) * r(), xx = w * r(), l = w * (.03 + r() * .08); x.beginPath(); x.moveTo(xx, y); x.quadraticCurveTo(xx + l / 2, y - h * .006, xx + l, y); x.stroke(); }
-  const s = h * (.5 + r() * .18), cx = w * (.28 + r() * .44), by = hz + (h - hz) * (.6 + r() * .18), lean = r() > .5 ? 1 : -1;
-  x.fillStyle = ['#ff5a36', '#ffd23f', '#f5f5f5', '#2ec4b6'][Math.floor(r() * 4)];
-  x.beginPath(); x.ellipse(cx, by, s * .55, s * .045, 0, 0, Math.PI * 2); x.fill();
-  x.strokeStyle = '#1b1b1b'; x.lineCap = 'round'; x.lineWidth = s * .06; x.beginPath();
-  x.moveTo(cx - s * .07, by - s * .03); x.lineTo(cx - s * .02, by - s * .33); x.moveTo(cx + s * .08, by - s * .03); x.lineTo(cx + s * .02, by - s * .33); x.stroke();
-  x.fillStyle = `hsl(${r() * 360},55%,42%)`; x.fillRect(cx - s * .085, by - s * .63, s * .17, s * .33);
-  x.fillStyle = '#c68e6a'; x.beginPath(); x.arc(cx, by - s * .71, s * .07, 0, Math.PI * 2); x.fill();
-  x.fillStyle = '#222'; x.fillRect(cx - s * .085, by - s * .8, s * .17, s * .04); x.fillRect(cx - s * .06, by - s * .73, s * .12, s * .025);
-  x.fillStyle = '#fff'; x.fillRect(cx - s * .065, by - s * .57, s * .13, s * .1);
-  x.fillStyle = '#111'; x.font = `800 ${s * .075}px system-ui`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(bib, cx, by - s * .52);
-  x.strokeStyle = '#c68e6a'; x.lineWidth = s * .04; x.beginPath(); x.moveTo(cx, by - s * .58); x.lineTo(cx + lean * s * .2, by - s * .5); x.stroke();
-  x.strokeStyle = '#222'; x.lineWidth = s * .02; x.beginPath(); x.moveTo(cx + lean * s * .14, by - s * .88); x.lineTo(cx + lean * s * .3, by + s * .05); x.stroke();
-  x.fillStyle = '#222'; x.beginPath(); x.ellipse(cx + lean * s * .31, by + s * .07, s * .025, s * .08, -lean * .35, 0, Math.PI * 2); x.fill();
-  return c;
-}
 const demo = (() => {
   const S = {
-    id: 1, site_name: 'M.A.R Fotografía', tagline: 'Fotografía de stand up paddle y eventos. Encontrá tus fotos por número de dorsal y llevátelas en alta calidad.',
-    watermark_text: '@m.a.r_fotografia', alias: 'alias.de.ejemplo', cbu: '0000003100012345678901', titular: 'Nombre Apellido',
-    whatsapp: '5493410000000', instagram: 'm.a.r_fotografia', youtube: 'https://www.youtube.com/', price_photo: 3500, pack_size: 5, pack_price: 12000,
-    live_active: false, live_title: 'Copa Paraná SUP — Fecha 4', live_url: ''
+    id: 1, site_name: 'M.A.R Fotografía', tagline: 'Fotografía de stand up paddle y eventos. Encontrá tus fotos por número de dorsal o con una selfie.',
+    watermark_text: '@m.a.r_fotografia', alias: '', cbu: '', titular: '',
+    whatsapp: '', instagram: 'm.a.r_fotografia', youtube: '', price_photo: 3500, pack_size: 5, pack_price: 12000,
+    live_active: false, live_title: '', live_url: '',
+    color_primary: '#0b2540', color_accent: '#ff5a36', logo_url: '',
+    about_title: 'Quién soy', about_photo_url: '', about_tags: ABOUT_DEFAULT.tags, about_text: ABOUT_DEFAULT.text
   };
-  const E = [
-    { id: 'e1000000-0000-4000-8000-000000000001', title: 'Copa Paraná SUP — Fecha 3', kind: 'competencia', location: 'Rosario, Rambla Catalunya', date: '2026-11-15', published: true },
-    { id: 'e1000000-0000-4000-8000-000000000002', title: 'Regata Laguna de Melincué', kind: 'competencia', location: 'Melincué, Santa Fe', date: '2026-10-25', published: true },
-    { id: 'e1000000-0000-4000-8000-000000000003', title: 'Clínica de técnica SUP', kind: 'evento', location: 'Funes', date: '2026-09-28', published: true }
-  ];
-  const TAGS = ['Largada', 'Boya 1', 'Boya 2', 'Llegada'];
-  const P = [];
-  E.forEach((e, ei) => { const r = rng(ei * 99 + 7); for (let i = 0; i < 14; i++) {
-    const bib = String(101 + Math.floor(r() * 40));
-    P.push({ id: `p${ei}000000-0000-4000-8000-${String(i).padStart(12, '0')}`, event_id: e.id, seed: ei * 1000 + i, bibs: e.kind === 'competencia' ? [bib] : [], tag: e.kind === 'competencia' ? TAGS[Math.floor(r() * 4)] : null, sort: i, file_name: `IMG_${4100 + i}.jpg` });
-  } });
-  const now = Date.now();
-  const SCH = [
-    { id: 's1', title: 'Copa Paraná SUP — Fecha 4', starts_at: new Date(now + 6 * 864e5).toISOString(), url: '' },
-    { id: 's2', title: 'Final Circuito Litoral', starts_at: new Date(now + 20 * 864e5).toISOString(), url: '' }
-  ];
+  const E = [], P = [], SCH = [];
   const O = store.get('demo_orders', []);
   const cache = {};
   const img = (p, kind) => {
     const k = p.id + kind; if (cache[k]) return cache[k];
-    if (p.blob) return cache[k] = URL.createObjectURL(kind === 't' ? p.blob.thumb : kind === 'p' ? p.blob.preview : p.blob.file);
-    const [w, h] = kind === 't' ? [600, 400] : [1350, 900];
-    const c = drawDemo(p.seed, w, h, p.bibs[0] || '');
-    if (kind !== 'o') drawWatermark(c.getContext('2d'), w, h, S.watermark_text || '© ' + S.site_name);
-    return cache[k] = c.toDataURL('image/jpeg', kind === 't' ? .72 : .8);
+    return cache[k] = URL.createObjectURL(kind === 't' ? p.blob.thumb : kind === 'p' ? p.blob.preview : p.blob.file);
   };
   const saveO = () => store.set('demo_orders', O.map(o => ({ ...o, receipt: o.receipt && o.receipt.length < 400000 ? o.receipt : null })));
   let authed = false;
@@ -599,7 +582,8 @@ const demo = (() => {
       P.push(p); if (v.faces) await this.saveFaces(p, v.faces); return p;
     },
     async saveFaces(p, faces) { const x = P.find(q => q.id === p.id) || p; x.faces = faces; x.faces_indexed = p.faces_indexed = true; x.faces_count = p.faces_count = faces.length; },
-    async originalImage(p) { const x = P.find(q => q.id === p.id) || p; return x.blob ? decodeFile(x.blob.file) : drawDemo(x.seed, 1350, 900, x.bibs[0] || ''); },
+    async originalImage(p) { const x = P.find(q => q.id === p.id) || p; return decodeFile(x.blob.file); },
+    async uploadBrand(blob) { return URL.createObjectURL(blob); },
     async matchFaces(eid, desc) {
       const out = [];
       for (const p of P) if (p.event_id === eid && p.faces) {
@@ -630,6 +614,29 @@ async function getEvent(id) { if (!evCache[id]) evCache[id] = await api.event(id
 const phCache = {};
 async function getPhotos(eid, force) { if (force || !phCache[eid]) phCache[eid] = await api.photos(eid); return phCache[eid]; }
 
+async function resizeImage(file, max, type = 'image/jpeg', q = .85) {
+  const src = await decodeFile(file), s = Math.min(1, max / Math.max(src.width, src.height));
+  const c = document.createElement('canvas'); c.width = Math.round(src.width * s); c.height = Math.round(src.height * s);
+  c.getContext('2d').drawImage(src, 0, 0, c.width, c.height); if (src.close) src.close();
+  return new Promise(r => c.toBlob(r, type, q));
+}
+/* Luminancia relativa (WCAG): L = 0,2126·R + 0,7152·G + 0,0722·B, con canales linealizados */
+function luminance(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || ''); if (!m) return null;
+  const n = parseInt(m[1], 16);
+  const [r, g, b] = [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
+  return .2126 * r + .7152 * g + .0722 * b;
+}
+function applyTheme() {
+  const ok = h => /^#[0-9a-f]{6}$/i.test(h || '');
+  const brand = ok(SET.color_primary) ? SET.color_primary : '#0b2540', accent = ok(SET.color_accent) ? SET.color_accent : '#ff5a36';
+  const lb = luminance(brand), la = luminance(accent), st = document.documentElement.style;
+  st.setProperty('--brand', brand); st.setProperty('--accent', accent);
+  st.setProperty('--brand-ink', lb > .33 ? '#0b1b2b' : '#ffffff');   // texto legible sobre el color principal
+  st.setProperty('--accent-ink', la > .4 ? '#0b1b2b' : '#ffffff');
+  st.setProperty('--brand2', lb > .2 ? `color-mix(in srgb, ${brand} 55%, #000)` : brand); // links legibles sobre blanco
+  const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.content = brand;
+}
 function wmText() { return SET.watermark_text || ('© ' + (SET.site_name || 'Foto')); }
 function waLink(phone, text) { return `https://wa.me/${digits(phone)}?text=${encodeURIComponent(text)}`; }
 function baseUrl() { return location.href.split('#')[0]; }
@@ -665,6 +672,7 @@ function renderNav() {
   const n = cart.ids.length;
   $('#nav').innerHTML = `
     <a href="#/" class="${on('#/')}">${ICON.cam}<span class="lbl">Fotos</span></a>
+    ${SET.about_text ? `<a href="#/quien-soy" class="${on('#/quien-soy')}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17c.8-1.8 2-2.6 3.5-2.6s2.7.8 3.5 2.6M15 10h3M15 14h3"/></svg><span class="lbl">Quién soy</span></a>` : ''}
     <a href="#/vivo" class="${on('#/vivo')}">${SET.live_active ? ICON.live : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>'}<span class="lbl">En vivo</span></a>
     ${n ? `<a href="#/carrito" class="cart-pill">${ICON.cart}<span>${n}</span></a>` : ''}
     <a href="#/admin" class="${on('#/admin')}" title="Panel del fotógrafo">${ICON.user}</a>`;
@@ -672,7 +680,9 @@ function renderNav() {
 function renderChrome() {
   const name = SET.site_name || 'Fotos';
   const parts = name.split(' ');
-  $('#logo').innerHTML = parts.length > 1 ? esc(parts.slice(0, -1).join(' ')) + ' <b>' + esc(parts.slice(-1)[0]) + '</b>' : esc(name);
+  applyTheme();
+  $('#logo').innerHTML = (SET.logo_url ? `<img src="${esc(SET.logo_url)}" alt="">` : '') +
+    `<span>${parts.length > 1 ? esc(parts.slice(0, -1).join(' ')) + ' <b>' + esc(parts.slice(-1)[0]) + '</b>' : esc(name)}</span>`;
   document.title = name + ' — Fotos SUP y eventos';
   const links = [];
   if (SET.instagram) links.push(`<a href="https://instagram.com/${esc(SET.instagram.replace('@', ''))}" target="_blank" rel="noopener">Instagram</a>`);
@@ -693,10 +703,11 @@ async function viewHome() {
   app.innerHTML = `
   <section class="hero"><div class="wrap">
     ${SET.live_active ? `<a class="live-banner" href="#/vivo"><span class="dot"></span><div><b>EN VIVO AHORA</b><div class="small">${esc(SET.live_title || 'Transmisión en vivo')}</div></div><span class="sp"></span><span class="btn sm accent">Ver</span></a>` : ''}
+    ${SET.logo_url ? `<img class="hero-logo" src="${esc(SET.logo_url)}" alt="">` : ''}
     <h1>${esc(SET.site_name || 'Fotografía')}</h1>
     <p>${esc(SET.tagline || '')}</p>
     <div class="row"><a href="#eventos" class="btn accent" onclick="event.preventDefault();document.getElementById('eventos').scrollIntoView({behavior:'smooth'})">Buscar mis fotos</a>
-    <a href="#/vivo" class="btn ghost" style="color:#fff;border-color:rgba(255,255,255,.35)">Transmisiones</a></div>
+    <a href="#/vivo" class="btn ghost" style="color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand-ink) 40%,transparent)">Transmisiones</a></div>
   </div></section>
   <section class="section" id="eventos"><div class="wrap">
     <div class="chips">
@@ -706,8 +717,12 @@ async function viewHome() {
       <a class="ev" href="#/evento/${e.id}">
         <div class="cov" style="background-image:url('${api.cover(e)}')"><span class="kind">${e.kind === 'competencia' ? 'Competencia' : 'Evento'}</span></div>
         <div class="bd"><h3>${esc(e.title)}</h3><div class="muted small">${esc(fmtDate(e.date))}${e.location ? ' · ' + esc(e.location) : ''}</div></div>
-      </a>`).join('')}</div>` : `<div class="empty">Todavía no hay eventos publicados.</div>`}
-  </div></section>`;
+      </a>`).join('')}</div>` : `<div class="empty card"><h3>Muy pronto, las primeras fotos</h3><p style="margin:0">Acá vas a encontrar las galerías de cada competencia y evento.${SET.instagram ? ` Mientras tanto, seguime en <a href="https://instagram.com/${esc(SET.instagram.replace('@', ''))}" target="_blank" rel="noopener">@${esc(SET.instagram.replace('@', ''))}</a>.` : ''}</p></div>`}
+  </div></section>
+  ${SET.about_text ? `<section class="section" style="padding-top:0"><div class="wrap"><a class="card teaser" href="#/quien-soy" style="text-decoration:none;color:inherit">
+    ${SET.about_photo_url ? `<img src="${esc(SET.about_photo_url)}" alt="">` : `<div class="ph">${esc((SET.site_name || 'F')[0])}</div>`}
+    <div style="min-width:0"><b style="font-size:17px">${esc(SET.about_title || 'Quién soy')}</b><p>${esc(SET.about_text.split(/\n+/)[0].slice(0, 160))}${SET.about_text.split(/\n+/)[0].length > 160 ? '…' : ''}</p><span style="color:var(--brand2);font-weight:650">Conocé más →</span></div>
+  </a></div></section>` : ''}`;
   $$('.chip', app).forEach(b => b.onclick = () => { homeFilter = b.dataset.f; viewHome(); });
 }
 
@@ -941,6 +956,33 @@ async function viewOrder(token, isNew) {
   };
 }
 
+async function viewAbout() {
+  const name = SET.site_name || 'Fotografía', ig = (SET.instagram || '').replace('@', '');
+  const paras = (SET.about_text || '').split(/\n+/).map(t => t.trim()).filter(Boolean);
+  const tags = (SET.about_tags || '').split(',').map(t => t.trim()).filter(Boolean);
+  $('#app').innerHTML = `<div class="wrap" style="padding-block:28px 36px">
+    <div class="about">
+      ${SET.about_photo_url ? `<img class="pic" src="${esc(SET.about_photo_url)}" alt="${esc(name)}">` : `<div class="pic ph">${esc(name[0])}</div>`}
+      <div class="txt">
+        <div class="small muted" style="font-weight:650;letter-spacing:.06em;text-transform:uppercase">${esc(SET.about_title || 'Quién soy')}</div>
+        <h2 style="margin-top:6px">${esc(name)}</h2>
+        ${tags.length ? `<div class="tags">${tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>` : ''}
+        ${paras.map(p => `<p>${esc(p)}</p>`).join('')}
+        ${ig ? `<a class="btn ghost" href="https://instagram.com/${esc(ig)}" target="_blank" rel="noopener">Instagram @${esc(ig)}</a>` : ''}
+      </div>
+    </div>
+    <div class="cta">
+      <h3>¿Querés que cubra tu evento?</h3>
+      <p>Competencias, clínicas, cumpleaños y eventos sociales. Contame la fecha, el lugar y qué tenés en mente.</p>
+      <div class="row">
+        ${SET.whatsapp ? `<a class="btn accent" target="_blank" rel="noopener" href="${waLink(SET.whatsapp, 'Hola! Quiero consultar por la cobertura de un evento. Fecha: … Lugar: … Tipo de evento: …')}">Consultar por WhatsApp</a>` : ''}
+        ${ig ? `<a class="btn ghost" style="color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand-ink) 40%,transparent)" href="https://instagram.com/${esc(ig)}" target="_blank" rel="noopener">Escribime por Instagram</a>` : ''}
+        <a class="btn ghost" style="color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand-ink) 40%,transparent)" href="#/vivo">Ver transmisiones</a>
+      </div>
+    </div>
+  </div>`;
+}
+
 function ytEmbed(u) {
   if (!u) return null; let m;
   if ((m = u.match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/|\/shorts\/)([\w-]{11})/))) return `https://www.youtube.com/embed/${m[1]}?autoplay=1&mute=1&playsinline=1`;
@@ -1078,7 +1120,7 @@ function eventForm(e = {}) {
       <label class="f"><span>Tipo</span><select name="kind"><option value="competencia" ${e.kind !== 'evento' ? 'selected' : ''}>Competencia</option><option value="evento" ${e.kind === 'evento' ? 'selected' : ''}>Evento</option></select></label>
       <label class="f"><span>Fecha</span><input type="date" name="date" value="${esc(e.date || '')}"></label>
       <label class="f"><span>Lugar</span><input type="text" name="location" value="${esc(e.location || '')}"></label>
-      <label class="f"><span>Precio por foto (vacío = general)</span><input type="number" name="price_photo" min="0" step="100" value="${e.price_photo ?? ''}"></label>
+      <label class="f"><span>Precio por foto (vacío = general)</span><input type="number" name="price_photo" min="0" step="1" value="${e.price_photo ?? ''}"></label>
     </div>
     <label class="switch"><input type="checkbox" name="published" ${e.published ? 'checked' : ''}> Publicado (visible para el público)</label>
     <div class="row"><button class="btn">Guardar</button>${e.id ? '<button type="button" class="btn bad sm" id="evdel">Eliminar evento</button>' : ''}</div>
@@ -1227,13 +1269,26 @@ async function adminLive(pane) {
 
 async function adminSettings(pane) {
   const s = SET;
-  const fld = (k, l, t = 'text', ph = '') => `<label class="f"><span>${l}</span><input type="${t}" name="${k}" value="${esc(s[k] ?? '')}" placeholder="${esc(ph)}" ${t === 'number' ? 'min="0" step="100"' : ''}></label>`;
+  const fld = (k, l, t = 'text', ph = '') => `<label class="f"><span>${l}</span><input type="${t}" name="${k}" value="${esc(s[k] ?? '')}" placeholder="${esc(ph)}" ${t === 'number' ? 'min="0" step="1"' : ''}></label>`;
   pane.innerHTML = `<form class="card" id="stf">
     <h3>Marca</h3>
+    <div class="brandprev">${s.logo_url ? `<img src="${esc(s.logo_url)}" alt="Logo">` : '<span class="small muted">Sin logo cargado</span>'}
+      <label class="btn sm ghost" style="cursor:pointer">Subir logo<input type="file" id="logoF" accept="image/png,image/jpeg,image/webp" hidden></label>
+      ${s.logo_url ? '<button type="button" class="btn sm ghost" id="logoX">Quitar</button>' : ''}</div>
+    <p class="small muted" style="margin-top:-6px">Ideal: PNG con fondo transparente.</p>
+    <div class="colorrow">
+      <label><input type="color" name="color_primary" value="${esc(s.color_primary || '#0b2540')}"> Color principal</label>
+      <label><input type="color" name="color_accent" value="${esc(s.color_accent || '#ff5a36')}"> Color de acento</label>
+    </div>
     <div class="grid2">${fld('site_name', 'Nombre de la marca')}${fld('watermark_text', 'Texto de marca de agua', 'text', '© ' + (s.site_name || ''))}</div>
     <label class="f"><span>Frase de portada</span><textarea name="tagline" rows="2">${esc(s.tagline || '')}</textarea></label>
     <div class="grid2">${fld('instagram', 'Instagram (usuario)')}${fld('whatsapp', 'WhatsApp (con 549…)', 'tel', '5493411234567')}</div>
     ${fld('youtube', 'Canal de YouTube (URL)', 'url')}
+    <h3 style="margin-top:10px">Quién soy</h3>
+    <div class="teaser" style="margin-bottom:12px">${s.about_photo_url ? `<img src="${esc(s.about_photo_url)}" alt="">` : `<div class="ph">${esc((s.site_name || 'F')[0])}</div>`}
+      <label class="btn sm ghost" style="cursor:pointer">Subir foto de perfil<input type="file" id="aboutF" accept="image/*" hidden></label></div>
+    <div class="grid2">${fld('about_title', 'Título de la sección', 'text', 'Quién soy')}${fld('about_tags', 'Especialidades (separadas por coma)')}</div>
+    <label class="f"><span>Presentación (dejá una línea en blanco entre párrafos)</span><textarea name="about_text" rows="7">${esc(s.about_text || '')}</textarea></label>
     <h3 style="margin-top:10px">Cobro por transferencia</h3>
     <div class="grid2">${fld('alias', 'Alias')}${fld('cbu', 'CBU / CVU')}</div>
     ${fld('titular', 'Titular de la cuenta')}
@@ -1244,11 +1299,23 @@ async function adminSettings(pane) {
   </form>`;
   $('#stf').onsubmit = async e => {
     e.preventDefault(); const f = e.target, o = {};
-    ['site_name', 'watermark_text', 'tagline', 'instagram', 'whatsapp', 'youtube', 'alias', 'cbu', 'titular'].forEach(k => o[k] = f[k].value.trim() || null);
+    ['site_name', 'watermark_text', 'tagline', 'instagram', 'whatsapp', 'youtube', 'alias', 'cbu', 'titular', 'about_title', 'about_tags', 'about_text', 'color_primary', 'color_accent'].forEach(k => o[k] = f[k].value.trim() || null);
     o.whatsapp = o.whatsapp ? digits(o.whatsapp) : null;
     ['price_photo', 'pack_size', 'pack_price'].forEach(k => o[k] = f[k].value === '' ? (k === 'price_photo' ? 0 : null) : +f[k].value);
     SET = { ...SET, ...(await api.saveSettings(o) || o) }; renderChrome(); toast('Ajustes guardados');
   };
+  // vista previa de colores en vivo
+  $$('input[type=color]', pane).forEach(i => i.oninput = () => { SET = { ...SET, [i.name]: i.value }; applyTheme(); });
+  const upBrand = async (file, kind, key, max, type) => {
+    try {
+      toast('Subiendo…');
+      const url = await api.uploadBrand(await resizeImage(file, max, type), kind);
+      SET = { ...SET, ...(await api.saveSettings({ [key]: url }) || { [key]: url }) }; renderChrome(); adminSettings(pane); toast('Listo');
+    } catch (e) { toast(e.message); }
+  };
+  $('#logoF').onchange = e => e.target.files[0] && upBrand(e.target.files[0], 'logo', 'logo_url', 512, 'image/png');
+  $('#aboutF').onchange = e => e.target.files[0] && upBrand(e.target.files[0], 'about', 'about_photo_url', 1000, 'image/jpeg');
+  const lx = $('#logoX'); if (lx) lx.onclick = async () => { SET = { ...SET, ...(await api.saveSettings({ logo_url: null }) || { logo_url: null }) }; renderChrome(); adminSettings(pane); };
 }
 
 /* =====================================================================
@@ -1267,6 +1334,7 @@ async function route() {
     else if (parts[0] === 'carrito') await viewCart();
     else if (parts[0] === 'pedido' && parts[1]) await viewOrder(parts[1], /nuevo=1/.test(qs || ''));
     else if (parts[0] === 'vivo') await viewLive();
+    else if (parts[0] === 'quien-soy') await viewAbout();
     else if (parts[0] === 'admin') await viewAdmin(parts.slice(1).join('/'));
     else await viewHome();
   } catch (e) {
@@ -1278,7 +1346,6 @@ async function route() {
 window.addEventListener('hashchange', route);
 
 (async () => {
-  if (DEMO) $('#demoStrip').classList.remove('hidden');
   try { SET = await api.settings(); } catch (e) { console.error(e); SET = {}; }
   renderChrome();
   route();
