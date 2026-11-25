@@ -1042,8 +1042,17 @@ async function adminOrders(pane) {
     else copy(link);
   };
   $$('[data-rc]', pane).forEach(b => b.onclick = async () => {
-    const o = byId(b.dataset.rc); const w = window.open('', '_blank');
-    try { const url = await api.receiptUrl(o.receipt_path || o.receipt); if (w) w.location = url; else location.href = url; } catch (e) { if (w) w.close(); toast(e.message); }
+    const o = byId(b.dataset.rc);
+    try {
+      const url = await api.receiptUrl(o.receipt_path || o.receipt);
+      const isPdf = /\.pdf(\?|$)|^data:application\/pdf/i.test(url);
+      const m = document.createElement('div'); m.className = 'modal';
+      m.innerHTML = `<div class="sheet"><div class="row" style="margin-bottom:10px"><h3 style="margin:0">Comprobante de ${esc(o.buyer_name)}</h3><span class="sp"></span><button class="iconbtn" style="background:var(--bg);color:var(--ink)" aria-label="Cerrar">✕</button></div>
+        <div class="small muted" style="margin-bottom:10px">Total del pedido: <b>${money(o.total)}</b>. Verificá el ingreso en tu home banking.</div>
+        ${isPdf ? `<a class="btn block" href="${esc(url)}" target="_blank" rel="noopener">Abrir PDF</a>` : `<img src="${esc(url)}" alt="Comprobante" style="width:100%;border-radius:10px;border:1px solid var(--line)">`}</div>`;
+      document.body.appendChild(m);
+      m.onclick = e => { if (e.target === m || e.target.closest('.iconbtn')) m.remove(); };
+    } catch (e) { toast(e.message); }
   });
   $$('[data-ap]', pane).forEach(b => b.onclick = async () => {
     const o = byId(b.dataset.ap);
