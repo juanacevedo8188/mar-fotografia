@@ -190,6 +190,29 @@ nav.main a.on,nav.main a:hover{color:var(--brand-ink);background:color-mix(in sr
 .colorrow{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
 .colorrow label{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
 .colorrow input[type=color]{width:46px;height:40px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff}
+/* chat de ayuda */
+#bot .fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:bottom .2s}
+.cartbar.show~#bot .fab{bottom:calc(84px + env(safe-area-inset-bottom))}
+#bot .panel{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:45;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 120px));background:var(--card);border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden}
+.cartbar.show~#bot .panel{bottom:calc(154px + env(safe-area-inset-bottom))}
+@media(max-width:480px){#bot .panel,.cartbar.show~#bot .panel{right:0;left:0;bottom:0;width:100%;height:min(88vh,620px);border-radius:18px 18px 0 0}}
+#bot .hd{background:var(--brand);color:var(--brand-ink);padding:14px 14px;display:flex;align-items:center;gap:10px}
+#bot .hd .av{width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;flex:none}
+#bot .hd .av img{width:100%;height:100%;object-fit:cover}
+#bot .hd b{display:block;line-height:1.2}
+#bot .hd small{opacity:.8}
+#bot .hd button{margin-left:auto;background:transparent;border:0;color:inherit;font-size:22px;cursor:pointer;width:38px;height:38px}
+#bot .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+#bot .m{max-width:86%;padding:9px 12px;border-radius:14px;font-size:14.5px;line-height:1.45;white-space:pre-line;overflow-wrap:anywhere}
+#bot .m.b{background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start}
+#bot .m.u{background:var(--brand);color:var(--brand-ink);border-bottom-right-radius:4px;align-self:flex-end}
+#bot .m a{color:var(--brand2);font-weight:650}
+#bot .qs{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}
+#bot .qs button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer;text-align:left}
+#bot .wa{display:inline-flex;align-items:center;gap:6px;background:#1f9d55;color:#fff!important;text-decoration:none;border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px;margin-top:6px}
+#bot form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--card);padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+#bot form input{flex:1;min-height:42px}
+#bot form button{border:0;border-radius:10px;background:var(--brand);color:var(--brand-ink);padding:0 14px;font-weight:700;cursor:pointer}
 footer{padding:28px 0 36px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line);margin-top:20px}
 .spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand2);border-radius:50%;animation:sp .8s linear infinite;margin:40px auto}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -205,6 +228,7 @@ footer{padding:28px 0 36px;color:var(--muted);font-size:13.5px;border-top:1px so
 <main id="app"><div class="spin"></div></main>
 <footer><div class="wrap row" id="foot"></div></footer>
 <div id="cartbar" class="cartbar"><div class="wrap"><div><b id="cbN">0 fotos</b><div class="small" style="opacity:.8" id="cbT"></div></div><div class="sp"></div><a href="#/carrito" class="btn accent">Ver pedido →</a></div></div>
+<div id="bot"></div>
 
 <script>
 /* =====================================================================
@@ -218,6 +242,38 @@ const CONFIG = {
 };
 
 const DEMO = !CONFIG.SUPABASE_URL;
+/* Preguntas del chat: bloques separados por una línea en blanco;
+   la primera línea es la pregunta y el resto la respuesta.
+   Variables: {precios} {alias} {instagram} {proxima} */
+const FAQ_DEFAULT = `¿Cómo encuentro mis fotos?
+Entrá a la competencia o evento y buscá tu número de dorsal. También podés tocar "Buscame con una selfie" y te muestro solo las fotos donde aparecés.
+
+¿Cuánto cuestan las fotos?
+{precios}
+
+¿Cómo pago?
+Por transferencia. Elegís tus fotos, transferís el monto exacto a {alias} y subís el comprobante en el mismo pedido.
+
+¿Cuándo recibo las fotos?
+Apenas verifico la transferencia, se habilita la descarga en el link de tu pedido y te aviso por WhatsApp.
+
+¿Las fotos tienen marca de agua?
+Las que ves en la web sí. Las que comprás se descargan en alta resolución y sin marca de agua.
+
+No me encuentro con la selfie
+Probá con una selfie de frente, con buena luz y sin anteojos ni gorra. Si en las fotos estás lejos o con gorra puede no detectarte: buscá por tu número de dorsal.
+
+Perdí el link de mi pedido
+Escribime por WhatsApp con tu nombre y el evento y te lo reenvío.
+
+¿Cuándo suben las fotos de la competencia?
+Las subo después de cada fecha. Si todavía no está tu evento, escribime y te aviso cuando estén.
+
+¿Hacés coberturas de eventos?
+Sí: competencias, clínicas, cumpleaños y eventos sociales. Escribime con la fecha, el lugar y el tipo de evento y te paso un presupuesto.
+
+¿Dónde veo las transmisiones en vivo?
+En la sección "En vivo" de la web. {proxima}`;
 const ABOUT_DEFAULT = {
   tags: 'Competencias de SUP, Eventos, Transmisiones en vivo',
   text: 'Soy fotógrafo independiente. Recorro las competencias de stand up paddle para que cada remador tenga sus mejores fotos, y también cubro eventos sociales y deportivos.\n\nAdemás transmito en vivo las competencias, para que familia y amigos las sigan desde donde estén.\n\nSi querés que cubra tu evento, escribime y lo charlamos.'
@@ -534,7 +590,7 @@ const demo = (() => {
   const S = {
     id: 1, site_name: 'M.A.R Fotografía', tagline: 'Fotografía de stand up paddle y eventos. Encontrá tus fotos por número de dorsal o con una selfie.',
     watermark_text: '@m.a.r_fotografia', alias: '', cbu: '', titular: '',
-    whatsapp: '', instagram: 'm.a.r_fotografia', youtube: '', price_photo: 3500, pack_size: 5, pack_price: 12000,
+    whatsapp: '5493416561946', instagram: 'm.a.r_fotografia', faq: FAQ_DEFAULT, youtube: '', price_photo: 3500, pack_size: 5, pack_price: 12000,
     live_active: false, live_title: '', live_url: '',
     color_primary: '#0b2540', color_accent: '#ff5a36', logo_url: '',
     about_title: 'Quién soy', about_photo_url: '', about_tags: ABOUT_DEFAULT.tags, about_text: ABOUT_DEFAULT.text
@@ -983,6 +1039,105 @@ async function viewAbout() {
   </div>`;
 }
 
+/* =====================================================================
+   CHAT DE AYUDA (preguntas frecuentes, sin IA externa)
+   Busca la pregunta más parecida por palabras clave; si no encuentra,
+   deriva a WhatsApp con la consulta ya escrita.
+   ===================================================================== */
+const BOT = {
+  open: false, log: [],
+  STOP: new Set('a al algo alguna como con cual cuales cuando de del donde el ella en es esta este hay la las le lo los me mi mis no o para pero por que quiero se si sin su sus te tengo tu tus un una uno y ya yo hola buenas buen dia tarde noche gracias porfa favor saber puedo podes hace hacen'.split(' ')),
+  // sinónimos → raíz común
+  SYN: { cuesta: 'precio', cuestan: 'precio', valor: 'precio', vale: 'precio', valen: 'precio', sale: 'precio', salen: 'precio', cobra: 'precio', cobras: 'precio', cobran: 'precio', costo: 'precio', plata: 'precio', pack: 'precio', paquete: 'precio',
+    pago: 'pagar', pagar: 'pagar', abono: 'pagar', abonar: 'pagar', transferencia: 'pagar', transferir: 'pagar', alias: 'pagar', cbu: 'pagar', cvu: 'pagar', mercadopago: 'pagar', efectivo: 'pagar',
+    recibo: 'recibir', llegan: 'recibir', llega: 'recibir', descargo: 'recibir', descargar: 'recibir', descarga: 'recibir', bajar: 'recibir', mandan: 'recibir', envian: 'recibir', demora: 'recibir', tarda: 'recibir',
+    marca: 'agua', watermark: 'agua', logo: 'agua', calidad: 'agua', resolucion: 'agua',
+    selfie: 'selfie', cara: 'selfie', reconocimiento: 'selfie', facial: 'selfie', encuentra: 'selfie', aparezco: 'selfie',
+    dorsal: 'encontrar', numero: 'encontrar', buscar: 'encontrar', busco: 'encontrar', encuentro: 'encontrar', encontrar: 'encontrar',
+    link: 'link', enlace: 'link', perdi: 'link', pedido: 'link', orden: 'link',
+    suben: 'suben', subis: 'suben', subir: 'suben', publican: 'suben', estan: 'suben', fecha: 'suben',
+    cobertura: 'cubrir', cubris: 'cubrir', cubrir: 'cubrir', contratar: 'cubrir', presupuesto: 'cubrir', evento: 'cubrir', eventos: 'cubrir', casamiento: 'cubrir', cumple: 'cubrir', cumpleanos: 'cubrir', fiesta: 'cubrir', sesion: 'cubrir',
+    vivo: 'vivo', transmision: 'vivo', transmisiones: 'vivo', transmiten: 'vivo', stream: 'vivo', youtube: 'vivo', directo: 'vivo' },
+  norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9ñ\s]/g, ' '); },
+  tokens(t) {
+    return this.norm(t).split(/\s+/).filter(w => w.length > 1 && !this.STOP.has(w))
+      .map(w => this.SYN[w] || this.SYN[w.replace(/(es|s)$/, '')] || w.replace(/(es|s)$/, ''));
+  },
+  faqs() {
+    return String(SET.faq || FAQ_DEFAULT).split(/\n\s*\n/).map(b => b.trim()).filter(Boolean).map(b => {
+      const [q, ...a] = b.split('\n'); return { q: q.trim(), a: a.join('\n').trim(), qt: new Set(this.tokens(q)), at: new Set(this.tokens(a.join(' '))) };
+    }).filter(f => f.q && f.a);
+  },
+  fill(a) {
+    const p = +SET.price_photo || 0, k = +SET.pack_size || 0, P = +SET.pack_price || 0;
+    const precios = (p ? `Cada foto sale ${money(p)}.` : 'El precio figura en cada evento.') + (k > 1 && P ? ` Pack de ${k} fotos: ${money(P)} (${money(P / k)} por foto).` : '') + ' Algunos eventos pueden tener un precio distinto: lo ves arriba de cada galería.';
+    const ig = (SET.instagram || '').replace('@', '');
+    return a.replace(/\{precios\}/g, precios)
+      .replace(/\{alias\}/g, SET.alias ? `el alias ${SET.alias}` : 'la cuenta que figura al confirmar el pedido')
+      .replace(/\{instagram\}/g, ig ? '@' + ig : '')
+      .replace(/\{proxima\}/g, this._next ? `La próxima: ${this._next.title}, el ${fmtDT(this._next.starts_at)} hs.` : '');
+  },
+  answer(text) {
+    const ut = this.tokens(text); if (!ut.length) return null;
+    let best = null, bs = 0;
+    for (const f of this.faqs()) {
+      let sc = 0; for (const t of ut) { if (f.qt.has(t)) sc += 2; else if (f.at.has(t)) sc += 1; }
+      if (sc > bs) { bs = sc; best = f; }
+    }
+    return bs >= 2 ? best : null;
+  },
+  waUrl(q) { return waLink(SET.whatsapp, q ? `Hola! Te escribo desde la web. ${q}` : 'Hola! Te escribo desde la web.'); },
+  waBtn(q) { return SET.whatsapp ? `<a class="wa" target="_blank" rel="noopener" href="${esc(this.waUrl(q))}">💬 Escribir por WhatsApp</a>` : ''; },
+  push(who, html) { this.log.push({ who, html }); this.renderMsgs(); },
+  ask(text) {
+    this.push('u', esc(text));
+    const f = this.answer(text);
+    setTimeout(() => {
+      if (f) this.push('b', esc(this.fill(f.a)) + (/whatsapp|escribime/i.test(f.a) ? '<br>' + this.waBtn(text) : ''));
+      else this.push('b', `No tengo esa respuesta guardada, pero te contesto yo por WhatsApp 🙂${SET.whatsapp ? `<br><span class="small muted">${esc(this.phoneFmt())}</span><br>` + this.waBtn(text) : ''}`);
+    }, 350);
+  },
+  phoneFmt() { const d = digits(SET.whatsapp); const n = d.replace(/^549?/, ''); return n.length === 10 ? `${n.slice(0, 3)} ${n.slice(3, 6)}-${n.slice(6)}` : d; },
+  renderMsgs() {
+    const box = $('#bot .msgs'); if (!box) return;
+    const chips = this.faqs().slice(0, 6);
+    box.innerHTML = this.log.map(m => `<div class="m ${m.who}">${m.html}</div>`).join('') +
+      `<div class="qs">${chips.map((f, i) => `<button type="button" data-i="${i}">${esc(f.q)}</button>`).join('')}</div>`;
+    $$('.qs button', box).forEach(b => b.onclick = () => this.ask(chips[+b.dataset.i].q));
+    box.scrollTop = box.scrollHeight;
+  },
+  async render() {
+    const root = $('#bot'); if (!root) return;
+    const hidden = (location.hash || '').startsWith('#/admin');
+    if (hidden) { root.innerHTML = ''; return; }
+    if (!this.open) {
+      root.innerHTML = `<button class="fab" aria-label="Abrir ayuda"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 16.5h.01"/></svg></button>`;
+      $('.fab', root).onclick = () => { this.open = true; this.render(); };
+      return;
+    }
+    if (!this.log.length) {
+      const name = (SET.site_name || '').split(' ')[0];
+      this.push('b', `¡Hola! 👋 Soy el asistente de ${esc(SET.site_name || 'la web')}. Elegí una pregunta o escribí la tuya.`);
+      try { this._next = (await api.schedule()).find(x => new Date(x.starts_at) > Date.now()); } catch {}
+      const mine = store.get('my_orders', []);
+      if (mine.length) this.log.push({ who: 'b', html: 'Tus pedidos desde este dispositivo:<br>' + mine.slice(0, 3).map(o => `<a href="#/pedido/${esc(o.token)}">${esc(o.event)} · ${o.n} fotos</a>`).join('<br>') });
+    }
+    const av = SET.about_photo_url || SET.logo_url;
+    root.innerHTML = `<div class="panel" role="dialog" aria-label="Ayuda">
+      <div class="hd"><div class="av">${av ? `<img src="${esc(av)}" alt="">` : esc((SET.site_name || 'F')[0])}</div>
+        <div><b>${esc(SET.site_name || 'Ayuda')}</b><small>Preguntas frecuentes${SET.whatsapp ? ' · WhatsApp' : ''}</small></div>
+        <button aria-label="Cerrar">✕</button></div>
+      <div class="msgs"></div>
+      <form><input type="text" id="botIn" placeholder="Escribí tu pregunta…" autocomplete="off" maxlength="300"><button>Enviar</button></form>
+    </div>
+    <button class="fab" aria-label="Cerrar ayuda" style="font-size:24px">✕</button>`;
+    this.renderMsgs();
+    $$('.hd button, .fab', root).forEach(b => b.onclick = () => { this.open = false; this.render(); });
+    $('form', root).onsubmit = e => { e.preventDefault(); const i = $('#botIn'); const t = i.value.trim(); if (t) { i.value = ''; this.ask(t); } };
+    root.querySelectorAll('.msgs a[href^="#/"]').forEach(a => a.addEventListener('click', () => { this.open = false; }));
+  }
+};
+
 function ytEmbed(u) {
   if (!u) return null; let m;
   if ((m = u.match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/|\/shorts\/)([\w-]{11})/))) return `https://www.youtube.com/embed/${m[1]}?autoplay=1&mute=1&playsinline=1`;
@@ -1282,13 +1437,15 @@ async function adminSettings(pane) {
     </div>
     <div class="grid2">${fld('site_name', 'Nombre de la marca')}${fld('watermark_text', 'Texto de marca de agua', 'text', '© ' + (s.site_name || ''))}</div>
     <label class="f"><span>Frase de portada</span><textarea name="tagline" rows="2">${esc(s.tagline || '')}</textarea></label>
-    <div class="grid2">${fld('instagram', 'Instagram (usuario)')}${fld('whatsapp', 'WhatsApp (con 549…)', 'tel', '5493411234567')}</div>
+    <div class="grid2">${fld('instagram', 'Instagram (usuario)')}${fld('whatsapp', 'WhatsApp (con 549…)', 'tel', '5493416561946')}</div>
     ${fld('youtube', 'Canal de YouTube (URL)', 'url')}
     <h3 style="margin-top:10px">Quién soy</h3>
     <div class="teaser" style="margin-bottom:12px">${s.about_photo_url ? `<img src="${esc(s.about_photo_url)}" alt="">` : `<div class="ph">${esc((s.site_name || 'F')[0])}</div>`}
       <label class="btn sm ghost" style="cursor:pointer">Subir foto de perfil<input type="file" id="aboutF" accept="image/*" hidden></label></div>
     <div class="grid2">${fld('about_title', 'Título de la sección', 'text', 'Quién soy')}${fld('about_tags', 'Especialidades (separadas por coma)')}</div>
     <label class="f"><span>Presentación (dejá una línea en blanco entre párrafos)</span><textarea name="about_text" rows="7">${esc(s.about_text || '')}</textarea></label>
+    <h3 style="margin-top:10px">Chat de ayuda</h3>
+    <label class="f"><span>Preguntas frecuentes: primera línea la pregunta, debajo la respuesta, y una línea en blanco entre cada una. Podés usar {precios}, {alias}, {instagram} y {proxima}.</span><textarea name="faq" rows="12" style="font-size:13.5px">${esc(s.faq || FAQ_DEFAULT)}</textarea></label>
     <h3 style="margin-top:10px">Cobro por transferencia</h3>
     <div class="grid2">${fld('alias', 'Alias')}${fld('cbu', 'CBU / CVU')}</div>
     ${fld('titular', 'Titular de la cuenta')}
@@ -1299,7 +1456,7 @@ async function adminSettings(pane) {
   </form>`;
   $('#stf').onsubmit = async e => {
     e.preventDefault(); const f = e.target, o = {};
-    ['site_name', 'watermark_text', 'tagline', 'instagram', 'whatsapp', 'youtube', 'alias', 'cbu', 'titular', 'about_title', 'about_tags', 'about_text', 'color_primary', 'color_accent'].forEach(k => o[k] = f[k].value.trim() || null);
+    ['site_name', 'watermark_text', 'tagline', 'instagram', 'whatsapp', 'youtube', 'alias', 'cbu', 'titular', 'about_title', 'about_tags', 'about_text', 'color_primary', 'color_accent', 'faq'].forEach(k => o[k] = f[k].value.trim() || null);
     o.whatsapp = o.whatsapp ? digits(o.whatsapp) : null;
     ['price_photo', 'pack_size', 'pack_price'].forEach(k => o[k] = f[k].value === '' ? (k === 'price_photo' ? 0 : null) : +f[k].value);
     SET = { ...SET, ...(await api.saveSettings(o) || o) }; renderChrome(); toast('Ajustes guardados');
@@ -1342,6 +1499,7 @@ async function route() {
     $('#app').innerHTML = `<div class="wrap empty"><h2>Algo salió mal</h2><p>${esc(e.message)}</p><a class="btn" href="#/">Volver al inicio</a></div>`;
   }
   updateCartUI();
+  BOT.render();
 }
 window.addEventListener('hashchange', route);
 

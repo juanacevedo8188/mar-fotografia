@@ -44,6 +44,11 @@ alter table settings add column if not exists about_tags text default 'Competenc
 alter table settings add column if not exists about_text text default
   E'Soy fotógrafo independiente. Recorro las competencias de stand up paddle para que cada remador tenga sus mejores fotos, y también cubro eventos sociales y deportivos.\n\nAdemás transmito en vivo las competencias, para que familia y amigos las sigan desde donde estén.\n\nSi querés que cubra tu evento, escribime y lo charlamos.';
 
+-- Chat de ayuda: si queda vacío, la web usa las preguntas por defecto
+alter table settings add column if not exists faq text;
+alter table settings alter column whatsapp set default '5493416561946';
+update settings set whatsapp = '5493416561946' where id = 1 and (whatsapp is null or whatsapp = '');
+
 insert into settings (id, site_name, watermark_text, instagram)
 values (1, 'M.A.R Fotografía', '@m.a.r_fotografia', 'm.a.r_fotografia')
 on conflict do nothing;
