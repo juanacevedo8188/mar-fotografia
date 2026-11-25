@@ -17,7 +17,7 @@ $$;
 -- ---------- Ajustes (una sola fila) ----------
 create table if not exists settings (
   id int primary key default 1 check (id = 1),
-  site_name text default 'Tu Marca Foto',
+  site_name text default 'M.A.R Fotografía',
   tagline text default 'Fotografía de stand up paddle y eventos',
   watermark_text text,
   alias text,
@@ -34,7 +34,9 @@ create table if not exists settings (
   live_url text,          -- URL de YouTube (video en vivo o canal)
   updated_at timestamptz default now()
 );
-insert into settings (id) values (1) on conflict do nothing;
+insert into settings (id, site_name, watermark_text, instagram)
+values (1, 'M.A.R Fotografía', '@m.a.r_fotografia', 'm.a.r_fotografia')
+on conflict do nothing;
 
 -- ---------- Eventos ----------
 create table if not exists events (
