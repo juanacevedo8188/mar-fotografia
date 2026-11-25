@@ -10,7 +10,7 @@ create table if not exists admins (
 );
 
 create or replace function public.is_admin() returns boolean
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, extensions as $$
   select exists (select 1 from admins where user_id = auth.uid())
 $$;
 
@@ -67,6 +67,41 @@ create table if not exists photos (
 );
 create index if not exists photos_event_idx on photos (event_id, sort);
 create index if not exists photos_bibs_idx on photos using gin (bibs);
+alter table photos add column if not exists faces_indexed boolean not null default false;
+alter table photos add column if not exists faces_count int;
+
+-- ---------- Caras (reconocimiento facial) ----------
+-- Un descriptor de 128 números por cara detectada (modelo face-api).
+-- Es un DATO BIOMÉTRICO: sin lectura pública. El público solo puede
+-- usar la función match_faces, que devuelve ids de fotos, nunca vectores.
+create extension if not exists vector;
+create table if not exists faces (
+  id bigint generated always as identity primary key,
+  photo_id uuid not null references photos on delete cascade,
+  event_id uuid not null references events on delete cascade,
+  embedding vector(128) not null,
+  box real[]                     -- x, y, ancho, alto (relativos 0–1)
+);
+create index if not exists faces_event_idx on faces (event_id);
+create index if not exists faces_photo_idx on faces (photo_id);
+
+-- Distancia euclídea d = ‖a − b‖₂ (operador <-> de pgvector).
+-- Misma persona si d < umbral. El umbral se limita a 0,6 como máximo.
+create or replace function public.match_faces(
+  p_event uuid, p_query vector(128), p_threshold float default 0.55, p_limit int default 300
+) returns table (photo_id uuid, distance float)
+language sql stable security definer set search_path = public, extensions as $$
+  select f.photo_id, min(f.embedding <-> p_query) as distance
+  from faces f
+  join events e on e.id = f.event_id and e.published
+  where f.event_id = p_event
+    and f.embedding <-> p_query < least(coalesce(p_threshold, 0.55), 0.6)
+  group by f.photo_id
+  order by 2
+  limit least(coalesce(p_limit, 300), 500)
+$$;
+revoke all on function public.match_faces(uuid, vector, float, int) from public;
+grant execute on function public.match_faces(uuid, vector, float, int) to anon, authenticated;
 
 -- ---------- Pedidos ----------
 create table if not exists orders (
@@ -103,6 +138,10 @@ alter table events enable row level security;
 alter table photos enable row level security;
 alter table orders enable row level security;
 alter table live_schedule enable row level security;
+alter table faces enable row level security;
+
+drop policy if exists "faces admin" on faces;
+create policy "faces admin" on faces for all using (is_admin()) with check (is_admin());
 
 drop policy if exists "admins self" on admins;
 create policy "admins self" on admins for select using (user_id = auth.uid());

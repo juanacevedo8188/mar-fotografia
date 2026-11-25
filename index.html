@@ -158,6 +158,13 @@ nav.main a.on,nav.main a:hover{color:#fff;background:rgba(255,255,255,.1)}
 .progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
 .progress i{display:block;height:100%;background:var(--ok);width:0;transition:width .2s}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:10px;z-index:80;font-weight:600;font-size:14px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(5,12,20,.6);display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:600px){.modal{align-items:center}}
+.modal .sheet{background:#fff;width:100%;max-width:460px;border-radius:18px 18px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+@media(min-width:600px){.modal .sheet{border-radius:18px}}
+.selfie-prev{width:120px;height:120px;border-radius:50%;object-fit:cover;margin:6px auto 12px;display:block;border:3px solid var(--line)}
+.facebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--okbg);border:1px solid #bfe5d2;color:#0b5c3d;border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.btn.face{background:#fff;color:var(--brand);border:1px solid var(--line)}
 .switch{display:flex;align-items:center;gap:10px;font-weight:650;margin-bottom:12px;cursor:pointer}
 .switch input{width:20px;height:20px}
 footer{padding:28px 0 36px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line);margin-top:20px}
@@ -271,13 +278,98 @@ async function decodeFile(file) {
   }
   const url = URL.createObjectURL(file), img = new Image(); img.src = url; await img.decode(); return img;
 }
-async function makeVersions(file, wm) {
+async function makeVersions(file, wm, faceOpts) {
   const src = await decodeFile(file);
   const thumb = await renderTo(src, 640, wm, .7);
   const preview = await renderTo(src, 1400, wm, .74);
+  let faces = null;
+  if (faceOpts) { try { faces = await FACE.detectAll(src, faceOpts); } catch (e) { console.error('faces', e); } }
   if (src.close) src.close();
-  return { thumb, preview };
+  return { thumb, preview, faces };
 }
+
+/* =====================================================================
+   RECONOCIMIENTO FACIAL (face-api, alojado en /vendor, carga diferida)
+   - Fotógrafo: al subir, detecta TODAS las caras (SSD MobileNet) y
+     guarda un descriptor de 128 números por cara.
+   - Cliente: la selfie se procesa EN SU CELULAR (detector liviano) y
+     solo viaja el descriptor; la imagen no se sube ni se guarda.
+   - Comparación: distancia euclídea d = ‖a − b‖₂ ; misma persona si d < umbral.
+   ===================================================================== */
+const FACE = {
+  BASE: 'vendor/face-api/',
+  THRESHOLD: 0.55,   // face-api recomienda 0.6; 0.55 = más estricto (menos falsos positivos)
+  _lib: null, _nets: {},
+  loadScript(src) {
+    return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('No se pudo cargar el reconocimiento facial')); document.head.appendChild(s); });
+  },
+  async lib() {
+    if (!this._lib) this._lib = (async () => {
+      if (!window.faceapi) await this.loadScript(this.BASE + 'face-api.js');
+      await faceapi.tf.ready();
+      return faceapi;
+    })().catch(e => { this._lib = null; throw e; }); // si falla, se reintenta la próxima vez
+    return this._lib;
+  },
+  async nets(names) {
+    const fa = await this.lib(), M = this.BASE + 'model';
+    await Promise.all(names.map(n => this._nets[n] || (this._nets[n] = fa.nets[n].loadFromUri(M)
+      .catch(() => { delete this._nets[n]; throw new Error('No se pudo cargar el reconocimiento facial. Revisá la conexión y probá de nuevo.'); }))));
+    return fa;
+  },
+  toCanvas(src, maxSide) {
+    const s = Math.min(1, maxSide / Math.max(src.width, src.height));
+    const c = document.createElement('canvas'); c.width = Math.round(src.width * s); c.height = Math.round(src.height * s);
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height); return c;
+  },
+  crop(c, x, y, w, h) {
+    const o = document.createElement('canvas'); o.width = w; o.height = h;
+    o.getContext('2d').drawImage(c, x, y, w, h, 0, 0, w, h); return o;
+  },
+  /* Todas las caras de una foto del evento. tiles=true agrega 4 recortes
+     superpuestos para encontrar caras chicas (remadores lejos). */
+  async detectAll(src, { tiles = false } = {}) {
+    const fa = await this.nets(['ssdMobilenetv1', 'faceLandmark68Net', 'faceRecognitionNet']);
+    const c = this.toCanvas(src, tiles ? 2400 : 1600);
+    const opt = new fa.SsdMobilenetv1Options({ minConfidence: 0.5, maxResults: 30 });
+    const regions = [[0, 0, c.width, c.height]];
+    if (tiles) {
+      const tw = Math.round(c.width * .6), th = Math.round(c.height * .6);
+      for (const [x, y] of [[0, 0], [c.width - tw, 0], [0, c.height - th], [c.width - tw, c.height - th]]) regions.push([x, y, tw, th]);
+    }
+    const found = [];
+    for (const [x, y, w, h] of regions) {
+      const input = (x === 0 && y === 0 && w === c.width && h === c.height) ? c : this.crop(c, x, y, w, h);
+      const res = await fa.detectAllFaces(input, opt).withFaceLandmarks().withFaceDescriptors();
+      for (const r of res) {
+        const b = r.detection.box;
+        if (b.width < 24) continue; // demasiado chica: descriptor poco confiable
+        const box = { x: (b.x + x) / c.width, y: (b.y + y) / c.height, w: b.width / c.width, h: b.height / c.height };
+        const dup = found.find(f => this.iou(f.box, box) > .4);
+        if (dup) { if (r.detection.score > dup.score) Object.assign(dup, { box, score: r.detection.score, descriptor: Array.from(r.descriptor) }); continue; }
+        found.push({ box, score: r.detection.score, descriptor: Array.from(r.descriptor) });
+      }
+    }
+    return found;
+  },
+  iou(a, b) {
+    const x1 = Math.max(a.x, b.x), y1 = Math.max(a.y, b.y), x2 = Math.min(a.x + a.w, b.x + b.w), y2 = Math.min(a.y + a.h, b.y + b.h);
+    const i = Math.max(0, x2 - x1) * Math.max(0, y2 - y1); return i / (a.w * a.h + b.w * b.h - i || 1);
+  },
+  /* Selfie: una sola cara (la más grande), con detector liviano. */
+  async selfie(src) {
+    const fa = await this.nets(['tinyFaceDetector', 'faceLandmark68Net', 'faceRecognitionNet']);
+    const c = this.toCanvas(src, 800);
+    let r = await fa.detectSingleFace(c, new fa.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: .4 })).withFaceLandmarks().withFaceDescriptor();
+    if (!r) { // segundo intento con el detector preciso, si ya está en caché o hace falta
+      await this.nets(['ssdMobilenetv1']);
+      r = await fa.detectSingleFace(c, new fa.SsdMobilenetv1Options({ minConfidence: .4 })).withFaceLandmarks().withFaceDescriptor();
+    }
+    return r ? Array.from(r.descriptor) : null;
+  },
+  dist(a, b) { let s = 0; for (let i = 0; i < a.length; i++) { const d = a[i] - b[i]; s += d * d; } return Math.sqrt(s); },
+  vec(d) { return '[' + d.map(v => v.toFixed(6)).join(',') + ']'; }
+};
 function blobToB64(blob) {
   return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
 }
@@ -379,7 +471,23 @@ const liveApi = {
       id, event_id: eid, thumb_path: base + '_t.jpg', preview_path: base + '_p.jpg', original_path: `${base}.${ext}`,
       file_name: file.name, bibs: meta.bibs, tag: meta.tag || null, sort: meta.sort, taken_at: new Date(file.lastModified).toISOString()
     }) });
+    if (v.faces) await this.saveFaces(p, v.faces);
     return p;
+  },
+  /* Caras: descriptores (dato biométrico) en tabla sin lectura pública. */
+  async saveFaces(p, faces) {
+    await sb.q(`faces?photo_id=eq.${p.id}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+    if (faces.length) await sb.q('faces', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(faces.map(f => ({ photo_id: p.id, event_id: p.event_id, embedding: FACE.vec(f.descriptor), box: [f.box.x, f.box.y, f.box.w, f.box.h] }))) });
+    await sb.q(`photos?id=eq.${p.id}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ faces_indexed: true, faces_count: faces.length }) });
+    p.faces_indexed = true; p.faces_count = faces.length;
+  },
+  async originalImage(p) {
+    const r = await fetch(await sb.sign('originals', p.original_path, 300));
+    if (!r.ok) throw new Error('No se pudo leer el original');
+    return decodeFile(await r.blob());
+  },
+  matchFaces(eid, desc) {
+    return sb.q('rpc/match_faces', { method: 'POST', body: JSON.stringify({ p_event: eid, p_query: FACE.vec(desc), p_threshold: FACE.THRESHOLD }) });
   },
   async updatePhoto(id, patch) { const [r] = await sb.q(`photos?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(patch) }); return r; },
   async deletePhoto(p) {
@@ -486,7 +594,20 @@ const demo = (() => {
     photosByIds: ids => wait(P.filter(p => ids.includes(p.id))),
     async saveEvent(e) { if (e.id) { Object.assign(E.find(x => x.id === e.id), e); return e; } const n = { ...e, id: uid() }; E.push(n); return n; },
     async deleteEvent(e) { E.splice(E.findIndex(x => x.id === e.id), 1); for (let i = P.length - 1; i >= 0; i--) if (P[i].event_id === e.id) P.splice(i, 1); },
-    async addPhoto(eid, file, v, meta) { const p = { id: uid(), event_id: eid, blob: { ...v, file }, bibs: meta.bibs, tag: meta.tag, sort: meta.sort, file_name: file.name }; P.push(p); return p; },
+    async addPhoto(eid, file, v, meta) {
+      const p = { id: uid(), event_id: eid, blob: { thumb: v.thumb, preview: v.preview, file }, bibs: meta.bibs, tag: meta.tag, sort: meta.sort, file_name: file.name };
+      P.push(p); if (v.faces) await this.saveFaces(p, v.faces); return p;
+    },
+    async saveFaces(p, faces) { const x = P.find(q => q.id === p.id) || p; x.faces = faces; x.faces_indexed = p.faces_indexed = true; x.faces_count = p.faces_count = faces.length; },
+    async originalImage(p) { const x = P.find(q => q.id === p.id) || p; return x.blob ? decodeFile(x.blob.file) : drawDemo(x.seed, 1350, 900, x.bibs[0] || ''); },
+    async matchFaces(eid, desc) {
+      const out = [];
+      for (const p of P) if (p.event_id === eid && p.faces) {
+        const d = Math.min(...p.faces.map(f => FACE.dist(f.descriptor, desc)));
+        if (d < FACE.THRESHOLD) out.push({ photo_id: p.id, distance: d });
+      }
+      return wait(out.sort((a, b) => a.distance - b.distance));
+    },
     async updatePhoto(id, patch) { const p = P.find(x => x.id === id); Object.assign(p, patch); return p; },
     async deletePhoto(p) { P.splice(P.indexOf(P.find(x => x.id === p.id)), 1); },
     async saveSettings(s) { Object.assign(S, s); return S; },
@@ -590,10 +711,11 @@ async function viewHome() {
   $$('.chip', app).forEach(b => b.onclick = () => { homeFilter = b.dataset.f; viewHome(); });
 }
 
-let galState = { q: '', tag: '' };
+let galState = { q: '', tag: '', faceEvent: null, faceIds: null };
 async function viewEvent(id) {
   const [ev, photos] = await Promise.all([getEvent(id), getPhotos(id)]);
   if (!ev) { $('#app').innerHTML = '<div class="wrap empty">Evento no encontrado.</div>'; return; }
+  if (galState.faceEvent !== id) { galState.faceEvent = id; galState.faceIds = null; }
   const tags = [...new Set(photos.map(p => p.tag).filter(Boolean))];
   const hasBibs = photos.some(p => p.bibs && p.bibs.length);
   $('#app').innerHTML = `
@@ -605,18 +727,31 @@ async function viewEvent(id) {
       <div class="small" style="margin-top:6px"><b>${esc(priceText(SET, ev))}</b></div>
     </div>
     <div class="tools">
+      <button class="btn face" id="selfieBtn">🤳 Buscame con una selfie</button>
       ${hasBibs ? `<div class="search">${ICON.search}<input type="text" inputmode="numeric" id="qBib" placeholder="Buscar por número de dorsal" value="${esc(galState.q)}"></div>` : ''}
       ${tags.length ? `<select id="qTag" style="flex:0 1 200px"><option value="">Todos los momentos</option>${tags.map(t => `<option ${galState.tag === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>` : ''}
     </div>
+    <div id="faceBar"></div>
     <div class="small muted" style="margin-bottom:10px">Tocá una foto para verla en grande. Usá el círculo para sumarla a tu pedido.</div>
     <div class="gal" id="gal"></div>
     <div class="pad-cart"></div>
   </div>`;
   const draw = () => {
-    const q = digits(galState.q), t = galState.tag;
-    const list = photos.filter(p => (!q || (p.bibs || []).some(b => digits(b) === q)) && (!t || p.tag === t));
+    const q = digits(galState.q), t = galState.tag, fi = galState.faceIds;
+    let list = photos.filter(p => (!q || (p.bibs || []).some(b => digits(b) === q)) && (!t || p.tag === t));
+    if (fi) { const rank = new Map(fi.map((x, i) => [x, i])); list = list.filter(p => rank.has(p.id)).sort((a, b) => rank.get(a.id) - rank.get(b.id)); }
+    const fb = $('#faceBar');
+    fb.innerHTML = fi ? `<div class="facebar"><b>🤳 ${fi.length ? `Te encontramos en ${fi.length} ${fi.length === 1 ? 'foto' : 'fotos'}` : 'No te encontramos con la selfie'}</b><span class="sp"></span>
+      ${fi.length ? `<button class="btn sm ok" id="fAll">Agregar todas</button>` : ''}<button class="btn sm ghost" id="fClr">Ver todas las fotos</button></div>` : '';
+    if (fi) {
+      $('#fClr').onclick = () => { galState.faceIds = null; draw(); };
+      const fa = $('#fAll'); if (fa) fa.onclick = () => {
+        for (const pid of list.map(p => p.id)) if (!cart.ids.includes(pid) && !toggleCart(id, pid)) return;
+        toast(`${list.length} fotos en tu pedido`); draw();
+      };
+    }
     const g = $('#gal');
-    if (!list.length) { g.innerHTML = `<div class="empty" style="grid-column:1/-1">No encontramos fotos${q ? ' con el dorsal ' + esc(q) : ''}. Probá con otro filtro.</div>`; return; }
+    if (!list.length) { g.innerHTML = `<div class="empty" style="grid-column:1/-1">${fi ? 'Probá con otra selfie (de frente, con buena luz y sin anteojos) o buscá por dorsal.' : `No encontramos fotos${q ? ' con el dorsal ' + esc(q) : ''}. Probá con otro filtro.`}</div>`; return; }
     g.innerHTML = list.map(p => `
       <div class="ph ${cart.ids.includes(p.id) ? 'on' : ''}" data-id="${p.id}">
         <img loading="lazy" src="${api.thumb(p)}" alt="" draggable="false">
@@ -634,7 +769,44 @@ async function viewEvent(id) {
   };
   const qb = $('#qBib'); if (qb) qb.oninput = () => { galState.q = qb.value; draw(); };
   const qt = $('#qTag'); if (qt) qt.onchange = () => { galState.tag = qt.value; draw(); };
+  $('#selfieBtn').onclick = () => openSelfie(ev, ids => { galState.faceIds = ids; draw(); window.scrollTo({ top: $('#faceBar').offsetTop - 70, behavior: 'smooth' }); });
   draw(); updateCartUI();
+}
+
+function openSelfie(ev, onResult) {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="sheet" role="dialog" aria-label="Buscar con selfie">
+    <div class="row"><h2 style="margin:0">Buscame con una selfie</h2><span class="sp"></span><button class="iconbtn" style="background:var(--bg);color:var(--ink)" id="sX" aria-label="Cerrar">✕</button></div>
+    <p class="small muted">Sacate una selfie de frente, con buena luz y sin anteojos ni gorra. Buscamos tu cara en las fotos de <b>${esc(ev.title)}</b>.</p>
+    <div class="pay small" style="margin:10px 0">🔒 <b>Tu selfie no se sube a ningún lado.</b> Se analiza en tu celular, se convierte en una huella numérica que solo se usa para esta búsqueda y no se guarda.</div>
+    <label class="switch small" style="font-weight:500;align-items:flex-start"><input type="checkbox" id="sOk" style="margin-top:2px"> <span>Acepto que se procese mi imagen facial solo para encontrar mis fotos en este evento.</span></label>
+    <img id="sPrev" class="selfie-prev hidden" alt="">
+    <div id="sMsg" class="small" style="text-align:center;min-height:20px;margin-bottom:10px"></div>
+    <label class="btn accent block" id="sGo" style="cursor:pointer">📷 Sacar selfie o elegir foto<input type="file" id="sF" accept="image/*" capture="user" hidden></label>
+  </div>`;
+  document.body.appendChild(m); document.body.style.overflow = 'hidden';
+  const close = () => { m.remove(); document.body.style.overflow = ''; };
+  $('#sX', m).onclick = close; m.onclick = e => { if (e.target === m) close(); };
+  const msg = (t, bad) => { const el = $('#sMsg', m); el.textContent = t; el.style.color = bad ? 'var(--bad)' : 'var(--muted)'; };
+  const go = $('#sGo', m), fi = $('#sF', m);
+  go.addEventListener('click', e => { if (!$('#sOk', m).checked) { e.preventDefault(); msg('Primero marcá la casilla de consentimiento.', true); } });
+  FACE.nets(['tinyFaceDetector', 'faceLandmark68Net', 'faceRecognitionNet']).catch(() => {}); // precarga mientras lee
+  fi.onchange = async () => {
+    const file = fi.files[0]; if (!file) return;
+    const url = URL.createObjectURL(file); const pv = $('#sPrev', m); pv.src = url; pv.classList.remove('hidden');
+    go.style.pointerEvents = 'none'; go.style.opacity = '.5';
+    try {
+      msg('Preparando el reconocimiento (la primera vez tarda unos segundos)…');
+      const src = await decodeFile(file);
+      msg('Analizando tu cara…');
+      const desc = await FACE.selfie(src); if (src.close) src.close();
+      if (!desc) throw new Error('No encontramos una cara en la foto. Probá de frente, más cerca y con buena luz.');
+      msg('Buscando en las fotos del evento…');
+      const res = await api.matchFaces(ev.id, desc);
+      close(); onResult(res.map(r => r.photo_id));
+    } catch (e) { console.error(e); msg(e.message, true); go.style.pointerEvents = ''; go.style.opacity = ''; fi.value = ''; }
+    finally { URL.revokeObjectURL(url); }
+  };
 }
 
 function openLightbox(ev, list, idx, onClose) {
@@ -936,18 +1108,23 @@ async function adminEvent(id) {
         <label class="f"><span>Momento / etiqueta para esta tanda</span><input type="text" id="upTag" placeholder="Largada, Boya 1, Llegada, Podio…"></label>
         <label class="f"><span>Dorsal para esta tanda (opcional)</span><input type="text" id="upBib" placeholder="Ej: 117"></label>
       </div>
+      <label class="switch small"><input type="checkbox" id="upFace" checked> Detectar caras para la búsqueda por selfie</label>
+      <label class="switch small"><input type="checkbox" id="upTiles" ${ev.kind !== 'evento' ? 'checked' : ''}> Buscar también caras chicas/lejanas (más preciso, ~3× más lento)</label>
       <label class="btn accent" style="cursor:pointer">📤 Elegir fotos<input type="file" id="upF" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
       <div id="upS" class="hidden"><div class="progress"><i id="upP"></i></div><div class="small muted" id="upT"></div></div>
     </div>
     <div class="card">
-      <div class="row" style="margin-bottom:10px"><h3 style="margin:0">${photos.length} fotos</h3><span class="sp"></span><a class="btn sm ghost" href="#/evento/${ev.id}" target="_blank">Ver como cliente</a></div>
+      <div class="row" style="margin-bottom:10px"><h3 style="margin:0">${photos.length} fotos</h3><span class="sp"></span>
+        ${photos.some(p => !p.faces_indexed) ? `<button class="btn sm" id="idx">🤳 Detectar caras (${photos.filter(p => !p.faces_indexed).length} pendientes)</button>` : ''}
+        <a class="btn sm ghost" href="#/evento/${ev.id}" target="_blank">Ver como cliente</a></div>
+      <div id="idxS" class="hidden"><div class="progress"><i id="idxP"></i></div><div class="small muted" id="idxT"></div></div>
       <p class="small muted" style="margin-top:0">Cargá los dorsales separados por coma (ej: <code>112, 140</code>). Se guarda solo al salir del campo.</p>
       <div class="aph">${photos.map(p => `
         <div class="it" data-id="${p.id}"><img src="${api.thumb(p)}" alt="" loading="lazy">
           <div class="b">
             <input type="text" data-k="bibs" inputmode="numeric" placeholder="Dorsales" value="${esc((p.bibs || []).join(', '))}">
             <input type="text" data-k="tag" placeholder="Etiqueta" value="${esc(p.tag || '')}">
-            <div class="row"><span class="small muted" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.file_name || '')}</span>
+            <div class="row"><span class="small muted" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.faces_indexed ? `🙂 ${p.faces_count ?? 0} · ` : ''}${esc(p.file_name || '')}</span>
             <button class="btn sm ghost" data-cov title="Usar como portada">★</button><button class="btn sm ghost" data-del title="Eliminar">🗑</button></div>
           </div></div>`).join('')}</div>
     </div></div>`;
@@ -970,7 +1147,9 @@ async function adminEvent(id) {
     const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     if (!files.length) return;
     const tag = $('#upTag').value.trim(), bibs = $('#upBib').value.split(/[,\s]+/).map(digits).filter(Boolean);
+    const faceOpts = $('#upFace').checked ? { tiles: $('#upTiles').checked } : null;
     $('#upS').classList.remove('hidden');
+    if (faceOpts) { $('#upT').textContent = 'Cargando el detector de caras…'; try { await FACE.nets(['ssdMobilenetv1', 'faceLandmark68Net', 'faceRecognitionNet']); } catch (ex) { toast(ex.message); } }
     let done = 0, fail = 0, first = null; const start = photos.length, total = files.length;
     const upd = () => { $('#upP').style.width = (done / total * 100) + '%'; $('#upT').textContent = `${done} de ${total} subidas${fail ? ` · ${fail} con error` : ''}… no cierres esta pestaña.`; };
     upd();
@@ -979,7 +1158,7 @@ async function adminEvent(id) {
       while (next < files.length) {
         const i = next++, file = files[i];
         try {
-          const v = await makeVersions(file, wmText());
+          const v = await makeVersions(file, wmText(), faceOpts);
           const p = await api.addPhoto(id, file, v, { tag, bibs, sort: start + i });
           if (!first) first = p;
         } catch (ex) { console.error(ex); fail++; }
@@ -991,6 +1170,19 @@ async function adminEvent(id) {
     delete evCache[id];
     toast(`Listo: ${done - fail} fotos subidas${fail ? `, ${fail} fallaron` : ''}`, 3500);
     adminEvent(id);
+  };
+  const idx = $('#idx'); if (idx) idx.onclick = async () => {
+    const pend = photos.filter(p => !p.faces_indexed), tiles = $('#upTiles').checked;
+    idx.disabled = true; $('#idxS').classList.remove('hidden');
+    let done = 0, fail = 0, faces = 0;
+    const upd = () => { $('#idxP').style.width = (done / pend.length * 100) + '%'; $('#idxT').textContent = `${done} de ${pend.length} fotos · ${faces} caras encontradas${fail ? ` · ${fail} con error` : ''}… no cierres esta pestaña.`; };
+    upd();
+    for (const p of pend) { // de a una: el detector usa la placa de video
+      try { const src = await api.originalImage(p); const f = await FACE.detectAll(src, { tiles }); if (src.close) src.close(); await api.saveFaces(p, f); faces += f.length; }
+      catch (ex) { console.error(ex); fail++; }
+      done++; upd();
+    }
+    toast(`Listo: ${faces} caras en ${done - fail} fotos`, 3500); adminEvent(id);
   };
 }
 

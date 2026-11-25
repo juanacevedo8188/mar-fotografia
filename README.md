@@ -44,8 +44,21 @@ Sin `CONFIG`, la web corre en **modo demo** con datos de ejemplo, para mostrarla
 
 Panel → En vivo: tildar "Estoy transmitiendo AHORA" y pegar el link del vivo de YouTube. Aparece un banner en la portada y el reproductor en `#/vivo`. Desde ahí también se carga la agenda de próximas transmisiones.
 
-## Pendiente (etapa 2)
+## Búsqueda por selfie (reconocimiento facial)
 
-- Búsqueda por selfie: embeddings faciales calculados en el navegador y guardados en Supabase con pgvector. La selfie no sale del celular.
+**Fotógrafo:** al subir fotos, el navegador detecta todas las caras y guarda un descriptor de 128 números por cara en la tabla `faces`. Con la opción "caras chicas/lejanas", además de la foto entera analiza 4 recortes superpuestos, para remadores lejos (es más lento). Las fotos subidas antes se procesan con el botón **"Detectar caras (N pendientes)"**.
+
+**Cliente:** toca "Buscame con una selfie", acepta el consentimiento y se saca una foto. La imagen **se analiza en su celular y no se sube**: al servidor solo viaja el descriptor, que no se guarda.
+
+**Comparación:** distancia euclídea entre descriptores, `d = ‖a − b‖₂`, calculada con pgvector. Se considera la misma persona si `d < 0,55` (face-api sugiere 0,6; usamos un valor más estricto para traer menos fotos de otras personas). El servidor no acepta umbrales mayores a 0,6.
+
+**Privacidad (Ley 25.326):** los descriptores son datos biométricos. La tabla `faces` no tiene lectura pública, y el público solo puede llamar a `match_faces`, que devuelve ids de fotos y nunca vectores. Al borrar una foto o un evento se borran sus caras.
+
+**Limitaciones en SUP:** con gorra, anteojos de sol, de perfil o muy lejos, la cara puede no detectarse o no coincidir. Por eso la búsqueda por dorsal sigue siendo la principal en competencias.
+
+**Librería:** [face-api](https://github.com/vladmandic/face-api) (MIT), alojada en `vendor/face-api/`, sin CDN externa. Solo se descarga cuando alguien usa la búsqueda: el cliente baja unos 7 MB la primera vez y el fotógrafo unos 13 MB. Después quedan en caché.
+
+## Pendiente
+
 - Lectura automática de dorsales con OCR al subir, para no cargarlos a mano.
 - Mercado Pago con aprobación automática por webhook.
