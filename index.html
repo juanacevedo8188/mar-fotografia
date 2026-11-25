@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b2540">
+<title>Fotos SUP y Eventos</title>
+<style>
+:root{
+  --bg:#f4f6f8;--card:#fff;--ink:#0b1b2b;--muted:#5d6d7e;--line:#e1e6eb;
+  --brand:#0b2540;--brand2:#0f6fb8;--accent:#ff5a36;--accent-ink:#fff;
+  --ok:#11875a;--okbg:#e5f5ee;--warn:#9a6a00;--warnbg:#fff4d6;--bad:#c22f2f;--badbg:#fdeaea;
+  --r:14px;--shadow:0 1px 2px rgba(11,27,43,.06),0 4px 16px rgba(11,27,43,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+a{color:var(--brand2)}
+img{display:block;max-width:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+button,input,select,textarea{font:inherit;color:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:11px 16px;font-weight:650;cursor:pointer;background:var(--brand);color:#fff;text-decoration:none;line-height:1.2;min-height:44px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.accent{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.ok{background:var(--ok)}
+.btn.bad{background:var(--bad)}
+.btn.sm{padding:7px 11px;min-height:34px;font-size:13px;border-radius:8px}
+.btn.block{width:100%}
+input[type=text],input[type=email],input[type=tel],input[type=number],input[type=password],input[type=date],input[type=datetime-local],input[type=url],select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;min-height:44px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand2);outline-offset:0;border-color:transparent}
+label.f{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 12px}
+label.f>span{display:block;margin-bottom:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+h1,h2,h3{line-height:1.15;margin:0 0 10px;letter-spacing:-.01em}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sp{flex:1}
+.hidden{display:none!important}
+
+/* header */
+.demo-strip{background:#fff4d6;color:#6b4a00;font-size:12.5px;text-align:center;padding:6px 12px}
+header.top{position:sticky;top:0;z-index:30;background:rgba(11,37,64,.97);color:#fff;backdrop-filter:blur(8px)}
+header.top .wrap{display:flex;align-items:center;gap:14px;height:58px}
+.logo{font-weight:800;font-size:18px;color:#fff;text-decoration:none;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo b{color:var(--accent)}
+nav.main{display:flex;gap:4px;margin-left:auto}
+nav.main a{color:#cfe0f1;text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+nav.main a.on,nav.main a:hover{color:#fff;background:rgba(255,255,255,.1)}
+.dot{width:8px;height:8px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 0 0 rgba(255,59,59,.7);animation:pulse 1.6s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(255,59,59,0)}100%{box-shadow:0 0 0 0 rgba(255,59,59,0)}}
+.cart-pill{background:var(--accent);color:#fff!important;border-radius:999px!important;padding:6px 12px!important}
+@media(max-width:600px){nav.main a .lbl{display:none} nav.main a{padding:8px}}
+
+/* hero */
+.hero{background:linear-gradient(160deg,#0b2540 0%,#0f4d82 55%,#1386c9 100%);color:#fff;padding:44px 0 56px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:90px;background:var(--bg);border-radius:50% 50% 0 0/100% 100% 0 0}
+.hero h1{font-size:clamp(28px,6vw,46px);font-weight:850;max-width:720px}
+.hero p{color:#d5e6f6;font-size:17px;max-width:600px;margin:0 0 22px}
+.live-banner{display:flex;align-items:center;gap:12px;background:#fff;color:var(--ink);border-radius:12px;padding:12px 14px;margin-bottom:20px;max-width:560px;text-decoration:none;box-shadow:var(--shadow)}
+.live-banner b{color:#d61f1f}
+
+/* events */
+.section{padding:22px 0 40px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:36px}
+.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.events{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.ev{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .15s}
+.ev:hover{transform:translateY(-2px)}
+.ev .cov{aspect-ratio:3/2;background:#cfd8e1 center/cover no-repeat;position:relative}
+.ev .kind{position:absolute;top:10px;left:10px;background:rgba(11,37,64,.85);color:#fff;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.ev .bd{padding:12px 14px 14px}
+.ev h3{font-size:17px;margin:0 0 4px}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+
+/* gallery */
+.ev-head{padding:22px 0 10px}
+.ev-head h1{font-size:clamp(24px,5vw,34px)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0 14px}
+.tools .search{flex:1 1 220px;position:relative}
+.tools .search input{padding-left:38px}
+.tools .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+@media(max-width:480px){.gal{grid-template-columns:repeat(2,1fr);gap:6px}}
+.ph{position:relative;aspect-ratio:3/2;border-radius:10px;overflow:hidden;background:#d5dde5;cursor:pointer;-webkit-touch-callout:none;user-select:none}
+.ph img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.ph .sel{position:absolute;top:7px;right:7px;width:30px;height:30px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ph.on{outline:3px solid var(--accent);outline-offset:-3px}
+.ph.on .sel{background:var(--accent);border-color:var(--accent)}
+.ph .sel svg{opacity:0}.ph.on .sel svg{opacity:1}
+.ph .bib{position:absolute;left:7px;bottom:7px;background:rgba(0,0,0,.55);color:#fff;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:6px}
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--brand);color:#fff;padding:10px 0 calc(10px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.15);transform:translateY(110%);visibility:hidden;transition:transform .2s,visibility .2s}
+.cartbar.show{transform:none;visibility:visible}
+.cartbar .wrap{display:flex;align-items:center;gap:12px}
+.pad-cart{height:80px}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:50;background:rgba(5,12,20,.94);display:flex;flex-direction:column}
+.lb .bar{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#fff}
+.lb .stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;min-height:0;padding:0 8px}
+.lb .stage img{max-width:100%;max-height:100%;object-fit:contain;-webkit-touch-callout:none;user-select:none;pointer-events:none}
+.lb .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);border:0;color:#fff;width:46px;height:46px;border-radius:50%;cursor:pointer;font-size:22px}
+.lb .nav.l{left:10px}.lb .nav.r{right:10px}
+.lb .foot{padding:12px 12px calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center;align-items:center;color:#cdd8e3;flex-wrap:wrap}
+.iconbtn{background:rgba(255,255,255,.12);border:0;color:#fff;width:42px;height:42px;border-radius:10px;cursor:pointer;font-size:20px}
+
+/* cart / checkout */
+.layout2{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
+@media(max-width:820px){.layout2{grid-template-columns:1fr}}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.mini .ph{border-radius:8px}
+.mini .x{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;font-size:14px;line-height:1}
+.sum{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}
+.sum.tot{font-size:20px;font-weight:800;border:0;padding-top:10px}
+.pay{background:#f0f6fc;border:1px solid #cfe3f5;border-radius:12px;padding:14px;margin:14px 0}
+.pay .k{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.pay .v{font-size:17px;font-weight:750;word-break:break-all}
+.copy{margin-left:auto}
+.drop{display:block;border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center;cursor:pointer;background:#fafbfc}
+.drop.has{border-color:var(--ok);background:var(--okbg)}
+
+/* status */
+.badge{display:inline-block;font-size:12px;font-weight:750;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.b-pendiente{background:var(--warnbg);color:var(--warn)}
+.b-aprobado{background:var(--okbg);color:var(--ok)}
+.b-rechazado{background:var(--badbg);color:var(--bad)}
+.dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.dl a{display:block;text-decoration:none;color:var(--ink);background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.dl a span{display:block;padding:8px 10px;font-size:13px;font-weight:650}
+
+/* live */
+.player{position:relative;aspect-ratio:16/9;background:#000;border-radius:var(--r);overflow:hidden}
+.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.offair{aspect-ratio:16/9;border-radius:var(--r);background:linear-gradient(160deg,#0b2540,#0f4d82);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+.sched{list-style:none;padding:0;margin:0}
+.sched li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.sched .d{background:var(--brand);color:#fff;border-radius:10px;padding:6px 10px;text-align:center;min-width:58px;font-weight:800;line-height:1.1}
+.sched .d small{display:block;font-weight:600;font-size:11px;opacity:.8;text-transform:uppercase}
+
+/* admin */
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:16px 0;padding-bottom:2px}
+.tabs button{border:0;background:#fff;border-radius:10px;padding:10px 14px;font-weight:650;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow)}
+.tabs button.on{background:var(--brand);color:#fff}
+.order{display:grid;grid-template-columns:1fr auto;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
+.order .thumbs{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.order .thumbs img{width:64px;height:43px;object-fit:cover;border-radius:5px}
+.order .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+@media(max-width:560px){.order{grid-template-columns:1fr}.order .acts{flex-direction:row;flex-wrap:wrap}}
+.aph{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.aph .it{background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.aph .it img{aspect-ratio:3/2;object-fit:cover;width:100%}
+.aph .it .b{padding:8px;display:flex;flex-direction:column;gap:6px}
+.aph .it input{min-height:36px;padding:6px 9px;font-size:13px}
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress i{display:block;height:100%;background:var(--ok);width:0;transition:width .2s}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:10px;z-index:80;font-weight:600;font-size:14px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.switch{display:flex;align-items:center;gap:10px;font-weight:650;margin-bottom:12px;cursor:pointer}
+.switch input{width:20px;height:20px}
+footer{padding:28px 0 36px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line);margin-top:20px}
+.spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand2);border-radius:50%;animation:sp .8s linear infinite;margin:40px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="demoStrip" class="demo-strip hidden">Modo demo: los datos son de ejemplo y no se guardan. Configurá Supabase en <code>CONFIG</code> para usar datos reales.</div>
+<header class="top">
+  <div class="wrap">
+    <a href="#/" class="logo" id="logo">Fotos</a>
+    <nav class="main" id="nav"></nav>
+  </div>
+</header>
+<main id="app"><div class="spin"></div></main>
+<footer><div class="wrap row" id="foot"></div></footer>
+<div id="cartbar" class="cartbar"><div class="wrap"><div><b id="cbN">0 fotos</b><div class="small" style="opacity:.8" id="cbT"></div></div><div class="sp"></div><a href="#/carrito" class="btn accent">Ver pedido →</a></div></div>
+
+<script>
+/* =====================================================================
+   CONFIG — completar con los datos del proyecto Supabase.
+   (La anon key es pública por diseño; la seguridad está en RLS.)
+   Si se dejan vacíos, la web corre en MODO DEMO.
+   ===================================================================== */
+const CONFIG = {
+  SUPABASE_URL: '',
+  SUPABASE_ANON_KEY: ''
+};
+
+const DEMO = !CONFIG.SUPABASE_URL;
+const U = CONFIG.SUPABASE_URL.replace(/\/$/, '');
+const K = CONFIG.SUPABASE_ANON_KEY;
+
+/* ---------- utils ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => '$' + Math.round(+n || 0).toLocaleString('es-AR');
+const digits = s => String(s || '').replace(/\D/g, '');
+const fmtDate = d => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('es-AR', {day:'numeric', month:'long', year:'numeric'}) : '';
+const fmtDT = d => new Date(d).toLocaleString('es-AR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'});
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => (Math.random()*16|0).toString(16)));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+function toast(msg, ms = 2600) {
+  $$('.toast').forEach(x => x.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ms);
+}
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast('Copiado: ' + text); }
+  catch { prompt('Copiá:', text); }
+}
+const ICON = {
+  check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+  search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  cart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/></svg>',
+  live: '<span class="dot"></span>',
+  cam: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  user: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>'
+};
+
+/* Precio: total = min( ⌊n/k⌋·P + (n mod k)·p , ⌈n/k⌉·P ) — igual que en el servidor */
+function calcTotal(n, s, ev) {
+  const p = ev && ev.price_photo != null && ev.price_photo !== '' ? +ev.price_photo : +s.price_photo || 0;
+  const k = +s.pack_size || 0, P = +s.pack_price || 0;
+  if (k > 1 && P > 0) return Math.min(Math.floor(n / k) * P + (n % k) * p, Math.ceil(n / k) * P);
+  return n * p;
+}
+function priceText(s, ev) {
+  const p = ev && ev.price_photo != null && ev.price_photo !== '' ? +ev.price_photo : +s.price_photo || 0;
+  let t = money(p) + ' por foto';
+  if (+s.pack_size > 1 && +s.pack_price > 0) t += ` · Pack ${s.pack_size} fotos ${money(s.pack_price)}`;
+  return t;
+}
+
+/* ---------- imagen: resize + marca de agua (en el navegador del fotógrafo) ---------- */
+function drawWatermark(ctx, w, h, text) {
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate(-Math.PI / 7);
+  const fs = Math.max(14, Math.round(Math.min(w, h) / 16));
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = `700 ${fs}px system-ui,sans-serif`;
+  ctx.lineWidth = Math.max(1, fs / 16);
+  ctx.strokeStyle = 'rgba(0,0,0,.16)'; ctx.fillStyle = 'rgba(255,255,255,.30)';
+  const stepX = ctx.measureText(text).width + fs * 2.2, stepY = fs * 3, R = Math.hypot(w, h);
+  for (let y = -R, row = 0; y < R; y += stepY, row++) {
+    const off = (row % 2) * stepX / 2;
+    for (let x = -R; x < R; x += stepX) { ctx.strokeText(text, x + off, y); ctx.fillText(text, x + off, y); }
+  }
+  ctx.font = `800 ${fs * 2.3}px system-ui,sans-serif`;
+  ctx.lineWidth = Math.max(1.5, fs / 10);
+  ctx.strokeStyle = 'rgba(0,0,0,.22)'; ctx.fillStyle = 'rgba(255,255,255,.5)';
+  ctx.strokeText(text, 0, 0); ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
+function renderTo(src, maxSide, wm, quality = .74) {
+  const sw = src.width, sh = src.height, s = Math.min(1, maxSide / Math.max(sw, sh));
+  const c = document.createElement('canvas'); c.width = Math.round(sw * s); c.height = Math.round(sh * s);
+  const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(src, 0, 0, c.width, c.height);
+  if (wm) drawWatermark(x, c.width, c.height, wm);
+  return new Promise(r => c.toBlob(r, 'image/jpeg', quality));
+}
+async function decodeFile(file) {
+  if ('createImageBitmap' in window) {
+    try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch {}
+  }
+  const url = URL.createObjectURL(file), img = new Image(); img.src = url; await img.decode(); return img;
+}
+async function makeVersions(file, wm) {
+  const src = await decodeFile(file);
+  const thumb = await renderTo(src, 640, wm, .7);
+  const preview = await renderTo(src, 1400, wm, .74);
+  if (src.close) src.close();
+  return { thumb, preview };
+}
+function blobToB64(blob) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
+}
+
+/* =====================================================================
+   SUPABASE (REST directo con fetch, sin librerías)
+   ===================================================================== */
+const sb = {
+  token: null, refresh: null, exp: 0,
+  load() { try { const s = JSON.parse(sessionStorage.getItem('fsb') || 'null'); if (s) Object.assign(this, s); } catch {} },
+  save(j) {
+    this.token = j.access_token; this.refresh = j.refresh_token; this.exp = Date.now() + j.expires_in * 1000;
+    try { sessionStorage.setItem('fsb', JSON.stringify({ token: this.token, refresh: this.refresh, exp: this.exp })); } catch {}
+  },
+  logout() { this.token = this.refresh = null; this.exp = 0; try { sessionStorage.removeItem('fsb'); } catch {} },
+  async auth(grant, body) {
+    const r = await fetch(`${U}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: K, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { if (grant === 'refresh_token') this.logout(); throw new Error(j.error_description || j.msg || 'Email o contraseña incorrectos'); }
+    this.save(j);
+  },
+  async ensure() { if (this.refresh && Date.now() > this.exp - 60000) await this.auth('refresh_token', { refresh_token: this.refresh }); },
+  hdr(extra = {}) { return { apikey: K, Authorization: 'Bearer ' + (this.token || K), ...extra }; },
+  async q(path, opt = {}) {
+    await this.ensure();
+    const r = await fetch(`${U}/rest/v1/${path}`, { ...opt, headers: this.hdr({ 'Content-Type': 'application/json', Prefer: 'return=representation', ...(opt.headers || {}) }) });
+    const t = await r.text();
+    if (!r.ok) { let m = t; try { m = JSON.parse(t).message || t; } catch {} throw new Error(m); }
+    return t ? JSON.parse(t) : null;
+  },
+  async upload(bucket, path, blob) {
+    await this.ensure();
+    const r = await fetch(`${U}/storage/v1/object/${bucket}/${path}`, { method: 'POST', headers: this.hdr({ 'Content-Type': blob.type || 'application/octet-stream', 'x-upsert': 'true', 'cache-control': '31536000' }), body: blob });
+    if (!r.ok) throw new Error('Error subiendo archivo: ' + await r.text());
+  },
+  async remove(bucket, paths) {
+    await this.ensure();
+    await fetch(`${U}/storage/v1/object/${bucket}`, { method: 'DELETE', headers: this.hdr({ 'Content-Type': 'application/json' }), body: JSON.stringify({ prefixes: paths }) });
+  },
+  async sign(bucket, path, expiresIn = 300) {
+    await this.ensure();
+    const r = await fetch(`${U}/storage/v1/object/sign/${bucket}/${path}`, { method: 'POST', headers: this.hdr({ 'Content-Type': 'application/json' }), body: JSON.stringify({ expiresIn }) });
+    const j = await r.json(); if (!r.ok) throw new Error(j.message || 'No se pudo firmar');
+    return `${U}/storage/v1${j.signedURL}`;
+  },
+  pub(path) { return `${U}/storage/v1/object/public/previews/${path}`; }
+};
+
+const strip = (o, keys) => { const c = { ...o }; keys.forEach(k => delete c[k]); return c; };
+
+const liveApi = {
+  async settings() { const [s] = await sb.q('settings?id=eq.1&select=*'); return s || {}; },
+  events() { return sb.q('events?select=*&order=date.desc.nullslast,created_at.desc'); },
+  async event(id) { const [e] = await sb.q(`events?id=eq.${id}&select=*`); return e; },
+  photos(eid) { return sb.q(`photos?event_id=eq.${eid}&select=*&order=sort.asc,file_name.asc`); },
+  thumb: p => sb.pub(p.thumb_path),
+  preview: p => sb.pub(p.preview_path),
+  cover: e => e.cover_path ? sb.pub(e.cover_path) : '',
+  async createOrder(body) {
+    const r = await fetch('/.netlify/functions/create-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'No se pudo crear el pedido'); return j;
+  },
+  async order(token) {
+    const r = await fetch('/.netlify/functions/order-status?token=' + encodeURIComponent(token));
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Pedido no encontrado'); return j;
+  },
+  schedule() { return sb.q('live_schedule?select=*&order=starts_at.asc'); },
+  /* admin */
+  authed: () => !!sb.token,
+  async login(email, password) {
+    await sb.auth('password', { email, password });
+    const a = await sb.q('admins?select=user_id');
+    if (!a.length) { sb.logout(); throw new Error('Este usuario no es administrador'); }
+  },
+  logout() { sb.logout(); },
+  orders() { return sb.q('orders?select=*,events(title)&order=created_at.desc&limit=300'); },
+  setOrder(id, patch) { return sb.q(`orders?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(patch) }); },
+  receiptUrl: path => sb.sign('receipts', path, 600),
+  photosByIds(ids) { return ids.length ? sb.q(`photos?id=in.(${ids.join(',')})&select=id,thumb_path,file_name,bibs`) : Promise.resolve([]); },
+  async saveEvent(e) {
+    const body = JSON.stringify(strip(e, ['id', 'created_at', 'cover_id']));
+    if (e.id) { const [r] = await sb.q(`events?id=eq.${e.id}`, { method: 'PATCH', body }); return r; }
+    const [r] = await sb.q('events', { method: 'POST', body }); return r;
+  },
+  async deleteEvent(e, photos) {
+    for (let i = 0; i < photos.length; i += 100) {
+      const ch = photos.slice(i, i + 100);
+      await sb.remove('previews', ch.flatMap(p => [p.thumb_path, p.preview_path]));
+      await sb.remove('originals', ch.map(p => p.original_path));
+    }
+    await sb.q(`events?id=eq.${e.id}`, { method: 'DELETE' });
+  },
+  async addPhoto(eid, file, v, meta) {
+    const id = uid(), base = `${eid}/${id}`, ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+    await sb.upload('previews', base + '_t.jpg', v.thumb);
+    await sb.upload('previews', base + '_p.jpg', v.preview);
+    await sb.upload('originals', `${base}.${ext}`, file);
+    const [p] = await sb.q('photos', { method: 'POST', body: JSON.stringify({
+      id, event_id: eid, thumb_path: base + '_t.jpg', preview_path: base + '_p.jpg', original_path: `${base}.${ext}`,
+      file_name: file.name, bibs: meta.bibs, tag: meta.tag || null, sort: meta.sort, taken_at: new Date(file.lastModified).toISOString()
+    }) });
+    return p;
+  },
+  async updatePhoto(id, patch) { const [r] = await sb.q(`photos?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(patch) }); return r; },
+  async deletePhoto(p) {
+    await sb.remove('previews', [p.thumb_path, p.preview_path]);
+    await sb.remove('originals', [p.original_path]);
+    await sb.q(`photos?id=eq.${p.id}`, { method: 'DELETE' });
+  },
+  async saveSettings(s) { const [r] = await sb.q('settings?id=eq.1', { method: 'PATCH', body: JSON.stringify({ ...strip(s, ['id']), updated_at: new Date().toISOString() }) }); return r; },
+  async addSchedule(x) { const [r] = await sb.q('live_schedule', { method: 'POST', body: JSON.stringify(x) }); return r; },
+  delSchedule(id) { return sb.q(`live_schedule?id=eq.${id}`, { method: 'DELETE' }); }
+};
+
+/* =====================================================================
+   MODO DEMO (datos de ejemplo generados en canvas)
+   ===================================================================== */
+function rng(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function drawDemo(seed, w, h, bib) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'), r = rng(seed), hz = h * (.36 + r() * .12), hue = 192 + r() * 26;
+  let g = x.createLinearGradient(0, 0, 0, hz); g.addColorStop(0, `hsl(${hue},70%,60%)`); g.addColorStop(1, `hsl(${hue + 12},60%,86%)`);
+  x.fillStyle = g; x.fillRect(0, 0, w, hz);
+  x.fillStyle = `hsl(${110 + r() * 40},28%,33%)`; x.beginPath(); x.moveTo(0, hz);
+  for (let i = 0; i <= 12; i++) x.lineTo(w * i / 12, hz - h * (.015 + r() * .05)); x.lineTo(w, hz); x.fill();
+  g = x.createLinearGradient(0, hz, 0, h); g.addColorStop(0, `hsl(${hue + 4},50%,42%)`); g.addColorStop(1, `hsl(${hue + 14},62%,20%)`);
+  x.fillStyle = g; x.fillRect(0, hz, w, h - hz);
+  x.strokeStyle = 'rgba(255,255,255,.2)'; x.lineWidth = Math.max(1, w / 420);
+  for (let i = 0; i < 50; i++) { const y = hz + (h - hz) * r(), xx = w * r(), l = w * (.03 + r() * .08); x.beginPath(); x.moveTo(xx, y); x.quadraticCurveTo(xx + l / 2, y - h * .006, xx + l, y); x.stroke(); }
+  const s = h * (.5 + r() * .18), cx = w * (.28 + r() * .44), by = hz + (h - hz) * (.6 + r() * .18), lean = r() > .5 ? 1 : -1;
+  x.fillStyle = ['#ff5a36', '#ffd23f', '#f5f5f5', '#2ec4b6'][Math.floor(r() * 4)];
+  x.beginPath(); x.ellipse(cx, by, s * .55, s * .045, 0, 0, Math.PI * 2); x.fill();
+  x.strokeStyle = '#1b1b1b'; x.lineCap = 'round'; x.lineWidth = s * .06; x.beginPath();
+  x.moveTo(cx - s * .07, by - s * .03); x.lineTo(cx - s * .02, by - s * .33); x.moveTo(cx + s * .08, by - s * .03); x.lineTo(cx + s * .02, by - s * .33); x.stroke();
+  x.fillStyle = `hsl(${r() * 360},55%,42%)`; x.fillRect(cx - s * .085, by - s * .63, s * .17, s * .33);
+  x.fillStyle = '#c68e6a'; x.beginPath(); x.arc(cx, by - s * .71, s * .07, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#222'; x.fillRect(cx - s * .085, by - s * .8, s * .17, s * .04); x.fillRect(cx - s * .06, by - s * .73, s * .12, s * .025);
+  x.fillStyle = '#fff'; x.fillRect(cx - s * .065, by - s * .57, s * .13, s * .1);
+  x.fillStyle = '#111'; x.font = `800 ${s * .075}px system-ui`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(bib, cx, by - s * .52);
+  x.strokeStyle = '#c68e6a'; x.lineWidth = s * .04; x.beginPath(); x.moveTo(cx, by - s * .58); x.lineTo(cx + lean * s * .2, by - s * .5); x.stroke();
+  x.strokeStyle = '#222'; x.lineWidth = s * .02; x.beginPath(); x.moveTo(cx + lean * s * .14, by - s * .88); x.lineTo(cx + lean * s * .3, by + s * .05); x.stroke();
+  x.fillStyle = '#222'; x.beginPath(); x.ellipse(cx + lean * s * .31, by + s * .07, s * .025, s * .08, -lean * .35, 0, Math.PI * 2); x.fill();
+  return c;
+}
+const demo = (() => {
+  const S = {
+    id: 1, site_name: 'Lente SUP', tagline: 'Fotografía de stand up paddle y eventos. Encontrá tus fotos por número de dorsal y llevátelas en alta calidad.',
+    watermark_text: '', alias: 'lente.sup.fotos', cbu: '0000003100012345678901', titular: 'Nombre Apellido',
+    whatsapp: '5493410000000', instagram: 'lente.sup', youtube: 'https://www.youtube.com/', price_photo: 3500, pack_size: 5, pack_price: 12000,
+    live_active: false, live_title: 'Copa Paraná SUP — Fecha 4', live_url: ''
+  };
+  const E = [
+    { id: 'e1000000-0000-4000-8000-000000000001', title: 'Copa Paraná SUP — Fecha 3', kind: 'competencia', location: 'Rosario, Rambla Catalunya', date: '2026-11-15', published: true },
+    { id: 'e1000000-0000-4000-8000-000000000002', title: 'Regata Laguna de Melincué', kind: 'competencia', location: 'Melincué, Santa Fe', date: '2026-10-25', published: true },
+    { id: 'e1000000-0000-4000-8000-000000000003', title: 'Clínica de técnica SUP', kind: 'evento', location: 'Funes', date: '2026-09-28', published: true }
+  ];
+  const TAGS = ['Largada', 'Boya 1', 'Boya 2', 'Llegada'];
+  const P = [];
+  E.forEach((e, ei) => { const r = rng(ei * 99 + 7); for (let i = 0; i < 14; i++) {
+    const bib = String(101 + Math.floor(r() * 40));
+    P.push({ id: `p${ei}000000-0000-4000-8000-${String(i).padStart(12, '0')}`, event_id: e.id, seed: ei * 1000 + i, bibs: e.kind === 'competencia' ? [bib] : [], tag: e.kind === 'competencia' ? TAGS[Math.floor(r() * 4)] : null, sort: i, file_name: `IMG_${4100 + i}.jpg` });
+  } });
+  const now = Date.now();
+  const SCH = [
+    { id: 's1', title: 'Copa Paraná SUP — Fecha 4', starts_at: new Date(now + 6 * 864e5).toISOString(), url: '' },
+    { id: 's2', title: 'Final Circuito Litoral', starts_at: new Date(now + 20 * 864e5).toISOString(), url: '' }
+  ];
+  const O = store.get('demo_orders', []);
+  const cache = {};
+  const img = (p, kind) => {
+    const k = p.id + kind; if (cache[k]) return cache[k];
+    if (p.blob) return cache[k] = URL.createObjectURL(kind === 't' ? p.blob.thumb : kind === 'p' ? p.blob.preview : p.blob.file);
+    const [w, h] = kind === 't' ? [600, 400] : [1350, 900];
+    const c = drawDemo(p.seed, w, h, p.bibs[0] || '');
+    if (kind !== 'o') drawWatermark(c.getContext('2d'), w, h, S.watermark_text || '© ' + S.site_name);
+    return cache[k] = c.toDataURL('image/jpeg', kind === 't' ? .72 : .8);
+  };
+  const saveO = () => store.set('demo_orders', O.map(o => ({ ...o, receipt: o.receipt && o.receipt.length < 400000 ? o.receipt : null })));
+  let authed = false;
+  const wait = (v) => new Promise(r => setTimeout(() => r(v), 120));
+  return {
+    settings: () => wait({ ...S }),
+    events: () => wait(E.filter(e => authed || e.published).map(e => ({ ...e })).sort((a, b) => (b.date || '').localeCompare(a.date || ''))),
+    event: id => wait(E.find(e => e.id === id)),
+    photos: eid => wait(P.filter(p => p.event_id === eid).sort((a, b) => a.sort - b.sort)),
+    thumb: p => img(p, 't'), preview: p => img(p, 'p'),
+    cover: e => { const p = P.find(x => x.id === e.cover_id) || P.find(x => x.event_id === e.id); return p ? img(p, 't') : ''; },
+    async createOrder(b) {
+      const ev = E.find(e => e.id === b.event_id);
+      const o = { id: uid(), token: Array.from({ length: 36 }, () => '0123456789abcdef'[Math.random() * 16 | 0]).join(''), event_id: b.event_id, events: { title: ev.title }, photo_ids: b.photo_ids, total: calcTotal(b.photo_ids.length, S, ev), buyer_name: b.name, buyer_phone: b.phone, buyer_email: b.email, receipt: `data:${b.receipt.type};base64,${b.receipt.data}`, status: 'pendiente', created_at: new Date().toISOString() };
+      O.unshift(o); saveO(); return wait({ token: o.token, total: o.total });
+    },
+    async order(t) {
+      const o = O.find(x => x.token === t); if (!o) throw new Error('Pedido no encontrado');
+      const out = { status: o.status, total: o.total, count: o.photo_ids.length, created_at: o.created_at, note: o.note, event: o.events.title, buyer: (o.buyer_name || '').split(' ')[0] };
+      if (o.status === 'aprobado') out.downloads = o.photo_ids.map(id => P.find(p => p.id === id)).filter(Boolean).map(p => ({ thumb: img(p, 't'), url: img(p, 'o'), name: p.file_name }));
+      return wait(out);
+    },
+    schedule: () => wait(SCH.slice().sort((a, b) => a.starts_at.localeCompare(b.starts_at))),
+    authed: () => authed,
+    async login() { authed = true; },
+    logout() { authed = false; },
+    orders: () => wait(O.slice()),
+    async setOrder(id, patch) { Object.assign(O.find(o => o.id === id), patch); saveO(); },
+    receiptUrl: async path => path,
+    photosByIds: ids => wait(P.filter(p => ids.includes(p.id))),
+    async saveEvent(e) { if (e.id) { Object.assign(E.find(x => x.id === e.id), e); return e; } const n = { ...e, id: uid() }; E.push(n); return n; },
+    async deleteEvent(e) { E.splice(E.findIndex(x => x.id === e.id), 1); for (let i = P.length - 1; i >= 0; i--) if (P[i].event_id === e.id) P.splice(i, 1); },
+    async addPhoto(eid, file, v, meta) { const p = { id: uid(), event_id: eid, blob: { ...v, file }, bibs: meta.bibs, tag: meta.tag, sort: meta.sort, file_name: file.name }; P.push(p); return p; },
+    async updatePhoto(id, patch) { const p = P.find(x => x.id === id); Object.assign(p, patch); return p; },
+    async deletePhoto(p) { P.splice(P.indexOf(P.find(x => x.id === p.id)), 1); },
+    async saveSettings(s) { Object.assign(S, s); return S; },
+    async addSchedule(x) { const n = { ...x, id: uid() }; SCH.push(n); return n; },
+    async delSchedule(id) { SCH.splice(SCH.findIndex(x => x.id === id), 1); }
+  };
+})();
+
+const api = DEMO ? demo : liveApi;
+if (!DEMO) sb.load();
+
+/* =====================================================================
+   ESTADO
+   ===================================================================== */
+let SET = {};
+let cart = store.get('cart', { eventId: null, ids: [] });
+const saveCart = () => { store.set('cart', cart); updateCartUI(); };
+const evCache = {};
+async function getEvent(id) { if (!evCache[id]) evCache[id] = await api.event(id); return evCache[id]; }
+const phCache = {};
+async function getPhotos(eid, force) { if (force || !phCache[eid]) phCache[eid] = await api.photos(eid); return phCache[eid]; }
+
+function wmText() { return SET.watermark_text || ('© ' + (SET.site_name || 'Foto')); }
+function waLink(phone, text) { return `https://wa.me/${digits(phone)}?text=${encodeURIComponent(text)}`; }
+function baseUrl() { return location.href.split('#')[0]; }
+
+async function updateCartUI() {
+  const n = cart.ids.length, bar = $('#cartbar');
+  const onGallery = location.hash.startsWith('#/evento/');
+  bar.classList.toggle('show', n > 0 && onGallery);
+  if (n) {
+    const ev = cart.eventId ? await getEvent(cart.eventId).catch(() => null) : null;
+    $('#cbN').textContent = n + (n === 1 ? ' foto' : ' fotos') + ' · ' + money(calcTotal(n, SET, ev));
+    $('#cbT').textContent = ev ? ev.title : '';
+  }
+  renderNav();
+}
+function toggleCart(eventId, pid) {
+  if (cart.eventId && cart.eventId !== eventId && cart.ids.length) {
+    if (!confirm('Tu pedido tiene fotos de otro evento. ¿Vaciarlo y empezar uno nuevo con este evento?')) return false;
+    cart = { eventId, ids: [] };
+  }
+  cart.eventId = eventId;
+  const i = cart.ids.indexOf(pid);
+  if (i >= 0) cart.ids.splice(i, 1); else cart.ids.push(pid);
+  saveCart(); return true;
+}
+
+/* =====================================================================
+   LAYOUT
+   ===================================================================== */
+function renderNav() {
+  const h = location.hash || '#/';
+  const on = p => h === p || (p !== '#/' && h.startsWith(p)) ? 'on' : '';
+  const n = cart.ids.length;
+  $('#nav').innerHTML = `
+    <a href="#/" class="${on('#/')}">${ICON.cam}<span class="lbl">Fotos</span></a>
+    <a href="#/vivo" class="${on('#/vivo')}">${SET.live_active ? ICON.live : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>'}<span class="lbl">En vivo</span></a>
+    ${n ? `<a href="#/carrito" class="cart-pill">${ICON.cart}<span>${n}</span></a>` : ''}
+    <a href="#/admin" class="${on('#/admin')}" title="Panel del fotógrafo">${ICON.user}</a>`;
+}
+function renderChrome() {
+  const name = SET.site_name || 'Fotos';
+  const parts = name.split(' ');
+  $('#logo').innerHTML = parts.length > 1 ? esc(parts.slice(0, -1).join(' ')) + ' <b>' + esc(parts.slice(-1)[0]) + '</b>' : esc(name);
+  document.title = name + ' — Fotos SUP y eventos';
+  const links = [];
+  if (SET.instagram) links.push(`<a href="https://instagram.com/${esc(SET.instagram.replace('@', ''))}" target="_blank" rel="noopener">Instagram</a>`);
+  if (SET.whatsapp) links.push(`<a href="${waLink(SET.whatsapp, 'Hola! Te escribo desde la web.')}" target="_blank" rel="noopener">WhatsApp</a>`);
+  if (SET.youtube) links.push(`<a href="${esc(SET.youtube)}" target="_blank" rel="noopener">YouTube</a>`);
+  $('#foot').innerHTML = `<span>© ${new Date().getFullYear()} ${esc(name)}</span><span class="sp"></span>${links.join(' · ')}`;
+  renderNav();
+}
+
+/* =====================================================================
+   VISTAS PÚBLICAS
+   ===================================================================== */
+let homeFilter = 'todos';
+async function viewHome() {
+  const evs = await api.events();
+  const app = $('#app');
+  const visible = evs.filter(e => e.published && (homeFilter === 'todos' || e.kind === homeFilter));
+  app.innerHTML = `
+  <section class="hero"><div class="wrap">
+    ${SET.live_active ? `<a class="live-banner" href="#/vivo"><span class="dot"></span><div><b>EN VIVO AHORA</b><div class="small">${esc(SET.live_title || 'Transmisión en vivo')}</div></div><span class="sp"></span><span class="btn sm accent">Ver</span></a>` : ''}
+    <h1>${esc(SET.site_name || 'Fotografía')}</h1>
+    <p>${esc(SET.tagline || '')}</p>
+    <div class="row"><a href="#eventos" class="btn accent" onclick="event.preventDefault();document.getElementById('eventos').scrollIntoView({behavior:'smooth'})">Buscar mis fotos</a>
+    <a href="#/vivo" class="btn ghost" style="color:#fff;border-color:rgba(255,255,255,.35)">Transmisiones</a></div>
+  </div></section>
+  <section class="section" id="eventos"><div class="wrap">
+    <div class="chips">
+      ${[['todos', 'Todos'], ['competencia', 'Competencias'], ['evento', 'Eventos']].map(([k, l]) => `<button class="chip ${homeFilter === k ? 'on' : ''}" data-f="${k}">${l}</button>`).join('')}
+    </div>
+    ${visible.length ? `<div class="events">${visible.map(e => `
+      <a class="ev" href="#/evento/${e.id}">
+        <div class="cov" style="background-image:url('${api.cover(e)}')"><span class="kind">${e.kind === 'competencia' ? 'Competencia' : 'Evento'}</span></div>
+        <div class="bd"><h3>${esc(e.title)}</h3><div class="muted small">${esc(fmtDate(e.date))}${e.location ? ' · ' + esc(e.location) : ''}</div></div>
+      </a>`).join('')}</div>` : `<div class="empty">Todavía no hay eventos publicados.</div>`}
+  </div></section>`;
+  $$('.chip', app).forEach(b => b.onclick = () => { homeFilter = b.dataset.f; viewHome(); });
+}
+
+let galState = { q: '', tag: '' };
+async function viewEvent(id) {
+  const [ev, photos] = await Promise.all([getEvent(id), getPhotos(id)]);
+  if (!ev) { $('#app').innerHTML = '<div class="wrap empty">Evento no encontrado.</div>'; return; }
+  const tags = [...new Set(photos.map(p => p.tag).filter(Boolean))];
+  const hasBibs = photos.some(p => p.bibs && p.bibs.length);
+  $('#app').innerHTML = `
+  <div class="wrap">
+    <div class="ev-head">
+      <a href="#/" class="small">← Todos los eventos</a>
+      <h1 style="margin-top:8px">${esc(ev.title)}</h1>
+      <div class="muted">${esc(fmtDate(ev.date))}${ev.location ? ' · ' + esc(ev.location) : ''} · ${photos.length} fotos</div>
+      <div class="small" style="margin-top:6px"><b>${esc(priceText(SET, ev))}</b></div>
+    </div>
+    <div class="tools">
+      ${hasBibs ? `<div class="search">${ICON.search}<input type="text" inputmode="numeric" id="qBib" placeholder="Buscar por número de dorsal" value="${esc(galState.q)}"></div>` : ''}
+      ${tags.length ? `<select id="qTag" style="flex:0 1 200px"><option value="">Todos los momentos</option>${tags.map(t => `<option ${galState.tag === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>` : ''}
+    </div>
+    <div class="small muted" style="margin-bottom:10px">Tocá una foto para verla en grande. Usá el círculo para sumarla a tu pedido.</div>
+    <div class="gal" id="gal"></div>
+    <div class="pad-cart"></div>
+  </div>`;
+  const draw = () => {
+    const q = digits(galState.q), t = galState.tag;
+    const list = photos.filter(p => (!q || (p.bibs || []).some(b => digits(b) === q)) && (!t || p.tag === t));
+    const g = $('#gal');
+    if (!list.length) { g.innerHTML = `<div class="empty" style="grid-column:1/-1">No encontramos fotos${q ? ' con el dorsal ' + esc(q) : ''}. Probá con otro filtro.</div>`; return; }
+    g.innerHTML = list.map(p => `
+      <div class="ph ${cart.ids.includes(p.id) ? 'on' : ''}" data-id="${p.id}">
+        <img loading="lazy" src="${api.thumb(p)}" alt="" draggable="false">
+        <button class="sel" aria-label="Seleccionar">${ICON.check}</button>
+        ${p.bibs && p.bibs.length ? `<span class="bib">#${esc(p.bibs.join(' #'))}</span>` : ''}
+      </div>`).join('');
+    $$('.ph', g).forEach(el => {
+      el.addEventListener('contextmenu', e => e.preventDefault());
+      el.onclick = e => {
+        const pid = el.dataset.id;
+        if (e.target.closest('.sel')) { if (toggleCart(id, pid)) el.classList.toggle('on', cart.ids.includes(pid)); return; }
+        openLightbox(ev, list, list.findIndex(p => p.id === pid), () => draw());
+      };
+    });
+  };
+  const qb = $('#qBib'); if (qb) qb.oninput = () => { galState.q = qb.value; draw(); };
+  const qt = $('#qTag'); if (qt) qt.onchange = () => { galState.tag = qt.value; draw(); };
+  draw(); updateCartUI();
+}
+
+function openLightbox(ev, list, idx, onClose) {
+  const lb = document.createElement('div'); lb.className = 'lb';
+  lb.innerHTML = `
+    <div class="bar"><span id="lbI" class="small"></span><span class="sp"></span><button class="iconbtn" id="lbX" aria-label="Cerrar">✕</button></div>
+    <div class="stage"><img id="lbImg" alt="" draggable="false"><button class="nav l" id="lbP" aria-label="Anterior">‹</button><button class="nav r" id="lbN" aria-label="Siguiente">›</button></div>
+    <div class="foot"><span id="lbB" class="small"></span><button class="btn accent" id="lbS"></button></div>`;
+  document.body.appendChild(lb); document.body.style.overflow = 'hidden';
+  const show = () => {
+    const p = list[idx]; const on = cart.ids.includes(p.id);
+    $('#lbImg', lb).src = api.preview(p);
+    $('#lbI', lb).textContent = `${idx + 1} / ${list.length}`;
+    $('#lbB', lb).textContent = p.bibs && p.bibs.length ? 'Dorsal ' + p.bibs.join(', ') + (p.tag ? ' · ' + p.tag : '') : (p.tag || '');
+    const b = $('#lbS', lb); b.textContent = on ? '✓ En tu pedido (quitar)' : '+ Agregar al pedido'; b.className = 'btn ' + (on ? 'ok' : 'accent');
+  };
+  const go = d => { idx = (idx + d + list.length) % list.length; show(); };
+  const close = () => { lb.remove(); document.body.style.overflow = ''; document.removeEventListener('keydown', key); onClose && onClose(); };
+  const key = e => { if (e.key === 'Escape') close(); if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); };
+  document.addEventListener('keydown', key);
+  $('#lbX', lb).onclick = close; $('#lbP', lb).onclick = () => go(-1); $('#lbN', lb).onclick = () => go(1);
+  $('#lbS', lb).onclick = () => { toggleCart(ev.id, list[idx].id); show(); };
+  lb.addEventListener('contextmenu', e => e.preventDefault());
+  let sx = null; const st = $('.stage', lb);
+  st.addEventListener('touchstart', e => sx = e.touches[0].clientX, { passive: true });
+  st.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1); sx = null; });
+  show();
+}
+
+async function viewCart() {
+  const app = $('#app');
+  if (!cart.ids.length || !cart.eventId) {
+    app.innerHTML = `<div class="wrap empty"><h2>Tu pedido está vacío</h2><p>Entrá a un evento y elegí tus fotos.</p><a class="btn" href="#/">Ver eventos</a></div>`; return;
+  }
+  const [ev, photos] = await Promise.all([getEvent(cart.eventId), getPhotos(cart.eventId)]);
+  const sel = photos.filter(p => cart.ids.includes(p.id));
+  if (sel.length !== cart.ids.length) { cart.ids = sel.map(p => p.id); saveCart(); }
+  const n = sel.length, total = calcTotal(n, SET, ev), unit = ev.price_photo != null && ev.price_photo !== '' ? +ev.price_photo : +SET.price_photo;
+  const saving = n * unit - total;
+  app.innerHTML = `
+  <div class="wrap" style="padding-top:20px;padding-bottom:30px">
+    <a href="#/evento/${ev.id}" class="small">← Seguir eligiendo en ${esc(ev.title)}</a>
+    <h1 style="margin-top:10px">Tu pedido</h1>
+    <div class="layout2">
+      <div class="card">
+        <div class="row" style="margin-bottom:10px"><b>${n} ${n === 1 ? 'foto' : 'fotos'}</b><span class="sp"></span><button class="btn sm ghost" id="clr">Vaciar</button></div>
+        <div class="mini">${sel.map(p => `<div class="ph"><img src="${api.thumb(p)}" alt="" draggable="false"><button class="x" data-id="${p.id}" aria-label="Quitar">✕</button></div>`).join('')}</div>
+        <div style="margin-top:16px">
+          <div class="sum"><span>${n} × ${money(unit)}</span><span>${money(n * unit)}</span></div>
+          ${saving > 0 ? `<div class="sum" style="color:var(--ok)"><span>Descuento por pack</span><span>−${money(saving)}</span></div>` : ''}
+          <div class="sum tot"><span>Total</span><span>${money(total)}</span></div>
+          ${+SET.pack_size > 1 && +SET.pack_price > 0 && n % SET.pack_size && saving >= 0 ? `<div class="small muted">Tip: con ${SET.pack_size - (n % SET.pack_size)} foto(s) más completás otro pack de ${SET.pack_size} por ${money(SET.pack_price)}.</div>` : ''}
+        </div>
+      </div>
+      <form class="card" id="chk" novalidate>
+        <h3>1. Transferí ${money(total)}</h3>
+        <div class="pay">
+          ${SET.alias ? `<div class="row"><div><div class="k">Alias</div><div class="v">${esc(SET.alias)}</div></div><button type="button" class="btn sm ghost copy" data-c="${esc(SET.alias)}">Copiar</button></div>` : ''}
+          ${SET.cbu ? `<div class="row" style="margin-top:10px"><div style="min-width:0"><div class="k">CBU / CVU</div><div class="v" style="font-size:15px">${esc(SET.cbu)}</div></div><button type="button" class="btn sm ghost copy" data-c="${esc(SET.cbu)}">Copiar</button></div>` : ''}
+          ${SET.titular ? `<div style="margin-top:10px"><div class="k">Titular</div><div>${esc(SET.titular)}</div></div>` : ''}
+          <div class="row" style="margin-top:10px"><div><div class="k">Monto exacto</div><div class="v">${money(total)}</div></div><button type="button" class="btn sm ghost copy" data-c="${Math.round(total)}">Copiar</button></div>
+        </div>
+        <h3>2. Tus datos y el comprobante</h3>
+        <label class="f"><span>Nombre y apellido *</span><input type="text" name="name" autocomplete="name" required></label>
+        <label class="f"><span>WhatsApp *</span><input type="tel" name="phone" autocomplete="tel" placeholder="341 555 1234" required></label>
+        <label class="f"><span>Email (opcional)</span><input type="email" name="email" autocomplete="email"></label>
+        <label class="drop" id="drop"><input type="file" name="rc" accept="image/*,application/pdf" hidden><span id="dropT">📎 Adjuntá el comprobante de la transferencia (foto, captura o PDF)</span></label>
+        <div id="err" class="small" style="color:var(--bad);margin-top:10px"></div>
+        <button class="btn accent block" style="margin-top:14px" id="send">Enviar pedido</button>
+        <p class="small muted" style="margin:10px 0 0">El fotógrafo verifica el pago y te habilita la descarga en alta resolución, sin marca de agua. Vas a recibir un link para descargar.</p>
+      </form>
+    </div>
+  </div>`;
+  $$('.x', app).forEach(b => b.onclick = () => { cart.ids = cart.ids.filter(i => i !== b.dataset.id); saveCart(); viewCart(); });
+  $('#clr').onclick = () => { if (confirm('¿Vaciar el pedido?')) { cart = { eventId: null, ids: [] }; saveCart(); viewCart(); } };
+  $$('.copy', app).forEach(b => b.onclick = () => copy(b.dataset.c));
+  const fi = $('input[name=rc]'), drop = $('#drop');
+  fi.onchange = () => { const f = fi.files[0]; drop.classList.toggle('has', !!f); $('#dropT').textContent = f ? '✓ ' + f.name : '📎 Adjuntá el comprobante'; };
+  $('#chk').onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target, err = $('#err'); err.textContent = '';
+    const name = f.name.value.trim(), phone = digits(f.phone.value), file = fi.files[0];
+    if (name.length < 2) return err.textContent = 'Completá tu nombre.';
+    if (phone.length < 8) return err.textContent = 'Completá un WhatsApp válido.';
+    if (!file) return err.textContent = 'Adjuntá el comprobante de la transferencia.';
+    const btn = $('#send'); btn.disabled = true; btn.textContent = 'Enviando…';
+    try {
+      let blob = file, type = file.type;
+      if (type.startsWith('image/')) { const src = await decodeFile(file); blob = await renderTo(src, 1600, null, .8); type = 'image/jpeg'; }
+      else if (type !== 'application/pdf') throw new Error('Formato no soportado. Subí una imagen o PDF.');
+      if (blob.size > 4.4 * 1024 * 1024) throw new Error('El archivo pesa demasiado (máx. 4 MB).');
+      const res = await api.createOrder({ event_id: ev.id, photo_ids: cart.ids, name, phone: phone.length === 10 ? '549' + phone : phone, email: f.email.value.trim(), receipt: { data: await blobToB64(blob), type } });
+      const mine = store.get('my_orders', []); mine.unshift({ token: res.token, event: ev.title, n, total: res.total, at: Date.now() }); store.set('my_orders', mine.slice(0, 20));
+      cart = { eventId: null, ids: [] }; saveCart();
+      location.hash = '#/pedido/' + res.token + '?nuevo=1';
+    } catch (ex) { err.textContent = ex.message; btn.disabled = false; btn.textContent = 'Enviar pedido'; }
+  };
+}
+
+async function viewOrder(token, isNew) {
+  const app = $('#app');
+  let o;
+  try { o = await api.order(token); } catch (e) { app.innerHTML = `<div class="wrap empty"><h2>No encontramos el pedido</h2><p>${esc(e.message)}</p></div>`; return; }
+  const link = baseUrl() + '#/pedido/' + token;
+  const msgs = {
+    pendiente: 'Recibimos tu pedido. El fotógrafo está verificando la transferencia; cuando la apruebe, vas a poder descargar las fotos desde esta misma página.',
+    aprobado: o.expired ? 'El pago fue aprobado, pero el link de descarga venció. Escribile al fotógrafo para renovarlo.' : '¡Pago aprobado! Descargá tus fotos en alta resolución.',
+    rechazado: 'No pudimos verificar el pago. ' + (o.note ? 'Motivo: ' + o.note : 'Escribile al fotógrafo para resolverlo.')
+  };
+  app.innerHTML = `
+  <div class="wrap" style="padding-top:22px;padding-bottom:30px">
+    <div class="card" style="max-width:760px;margin:0 auto">
+      <div class="row"><h2 style="margin:0">Pedido ${o.buyer ? 'de ' + esc(o.buyer) : ''}</h2><span class="sp"></span><span class="badge b-${o.status}">${o.status}</span></div>
+      <div class="muted small" style="margin-top:4px">${esc(o.event || '')} · ${o.count} fotos · ${money(o.total)} · ${fmtDT(o.created_at)}</div>
+      <p style="margin:14px 0">${esc(msgs[o.status])}</p>
+      ${isNew || o.status === 'pendiente' ? `
+        <div class="pay"><div class="k">Guardá este link para volver a tu pedido</div>
+          <div class="row" style="margin-top:6px"><div class="small" style="word-break:break-all;flex:1">${esc(link)}</div><button class="btn sm ghost copy" data-c="${esc(link)}">Copiar</button></div>
+        </div>
+        ${SET.whatsapp ? `<a class="btn ok block" target="_blank" rel="noopener" href="${waLink(SET.whatsapp, `Hola! Hice un pedido de ${o.count} fotos (${o.event}) por ${money(o.total)} y adjunté el comprobante. Mi pedido: ${link}`)}">Avisar al fotógrafo por WhatsApp</a>` : ''}
+        <button class="btn ghost block" style="margin-top:8px" id="ref">Actualizar estado</button>` : ''}
+      ${o.downloads ? `
+        <div class="row" style="margin:6px 0 12px"><b>${o.downloads.length} fotos</b><span class="sp"></span><button class="btn sm" id="all">Descargar todas</button></div>
+        <div class="dl">${o.downloads.map(d => `<a href="${esc(d.url)}" download="${esc(d.name)}" target="_blank" rel="noopener"><img src="${d.thumb || (d.thumb_path ? sb.pub(d.thumb_path) : '')}" alt="" style="aspect-ratio:3/2;object-fit:cover;width:100%"><span>⬇ ${esc(d.name)}</span></a>`).join('')}</div>
+        <p class="small muted" style="margin-top:12px">Los links de descarga se renuevan cada vez que abrís esta página. En celular: abrí la foto, mantené presionado y elegí "Guardar imagen".</p>` : ''}
+    </div>
+  </div>`;
+  $$('.copy', app).forEach(b => b.onclick = () => copy(b.dataset.c));
+  const r = $('#ref'); if (r) r.onclick = () => viewOrder(token, isNew);
+  const all = $('#all'); if (all) all.onclick = async () => {
+    for (const a of $$('.dl a', app)) { a.click(); await new Promise(r => setTimeout(r, 700)); }
+  };
+}
+
+function ytEmbed(u) {
+  if (!u) return null; let m;
+  if ((m = u.match(/(?:v=|youtu\.be\/|\/live\/|\/embed\/|\/shorts\/)([\w-]{11})/))) return `https://www.youtube.com/embed/${m[1]}?autoplay=1&mute=1&playsinline=1`;
+  if ((m = u.match(/channel\/(UC[\w-]{22})/) || u.match(/^(UC[\w-]{22})$/))) return `https://www.youtube.com/embed/live_stream?channel=${m[1]}&autoplay=1&mute=1&playsinline=1`;
+  return null;
+}
+async function viewLive() {
+  const sch = (await api.schedule()).filter(s => new Date(s.starts_at) > Date.now() - 6 * 3600e3);
+  const emb = SET.live_active ? ytEmbed(SET.live_url) : null;
+  $('#app').innerHTML = `
+  <div class="wrap" style="padding-top:22px;padding-bottom:30px">
+    <h1>Transmisiones en vivo</h1>
+    <p class="muted" style="margin-top:-4px">Seguí las competencias en directo.</p>
+    <div class="layout2">
+      <div>
+        ${SET.live_active
+          ? (emb ? `<div class="player"><iframe src="${emb}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="En vivo"></iframe></div>`
+                 : `<div class="offair"><span class="dot"></span><h2 style="margin:12px 0 6px">EN VIVO AHORA</h2><a class="btn accent" href="${esc(SET.live_url)}" target="_blank" rel="noopener">Ver transmisión</a></div>`)
+          : `<div class="offair"><div style="font-size:40px">📡</div><h2 style="margin:8px 0 4px">No hay transmisión en este momento</h2><div style="opacity:.8">${sch[0] ? 'Próxima: ' + esc(sch[0].title) + ' · ' + fmtDT(sch[0].starts_at) : 'Mirá la agenda de próximas fechas.'}</div>${SET.youtube ? `<a class="btn accent" style="margin-top:14px" href="${esc(SET.youtube)}" target="_blank" rel="noopener">Suscribite al canal</a>` : ''}</div>`}
+        ${SET.live_active ? `<h2 style="margin-top:14px">${esc(SET.live_title || '')}</h2>` : ''}
+      </div>
+      <div class="card">
+        <h3>Próximas transmisiones</h3>
+        ${sch.length ? `<ul class="sched">${sch.map(s => { const d = new Date(s.starts_at); return `<li><div class="d">${d.getDate()}<small>${d.toLocaleDateString('es-AR', { month: 'short' })}</small></div><div style="min-width:0"><b>${esc(s.title)}</b><div class="small muted">${d.toLocaleDateString('es-AR', { weekday: 'long' })} · ${d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })} hs</div></div></li>`; }).join('')}</ul>` : '<p class="muted">Sin fechas cargadas por ahora.</p>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   PANEL DEL FOTÓGRAFO
+   ===================================================================== */
+let adminTab = 'pedidos', orderFilter = 'pendiente';
+async function viewAdmin(sub) {
+  const app = $('#app');
+  if (!api.authed()) {
+    app.innerHTML = `<div class="wrap" style="padding:40px 16px;max-width:420px">
+      <form class="card" id="lg"><h2>Panel del fotógrafo</h2>
+        ${DEMO ? '<p class="small muted">Modo demo: entrá con cualquier dato.</p>' : ''}
+        <label class="f"><span>Email</span><input type="email" name="em" autocomplete="username" required></label>
+        <label class="f"><span>Contraseña</span><input type="password" name="pw" autocomplete="current-password" required></label>
+        <div id="le" class="small" style="color:var(--bad);margin-bottom:10px"></div>
+        <button class="btn block">Entrar</button></form></div>`;
+    $('#lg').onsubmit = async e => {
+      e.preventDefault(); const b = e.target.querySelector('button'); b.disabled = true;
+      try { await api.login(e.target.em.value.trim(), e.target.pw.value); viewAdmin(sub); }
+      catch (ex) { $('#le').textContent = ex.message; b.disabled = false; }
+    };
+    return;
+  }
+  if (sub && sub.startsWith('evento/')) return adminEvent(sub.split('/')[1]);
+  app.innerHTML = `<div class="wrap" style="padding-top:16px;padding-bottom:40px">
+    <div class="row"><h1 style="margin:0">Panel</h1><span class="sp"></span><button class="btn sm ghost" id="out">Salir</button></div>
+    <div class="tabs">${[['pedidos', 'Pedidos'], ['eventos', 'Eventos y fotos'], ['vivo', 'En vivo'], ['ajustes', 'Ajustes']].map(([k, l]) => `<button data-t="${k}" class="${adminTab === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+    <div id="pane"><div class="spin"></div></div></div>`;
+  $('#out').onclick = () => { api.logout(); viewAdmin(); };
+  $$('.tabs button', app).forEach(b => b.onclick = () => { adminTab = b.dataset.t; viewAdmin(); });
+  try { await ({ pedidos: adminOrders, eventos: adminEvents, vivo: adminLive, ajustes: adminSettings })[adminTab]($('#pane')); }
+  catch (e) { $('#pane').innerHTML = `<div class="card" style="color:var(--bad)">${esc(e.message)}</div>`; if (/JWT|token/i.test(e.message)) { api.logout(); } }
+}
+
+async function adminOrders(pane) {
+  const all = await api.orders();
+  const list = all.filter(o => orderFilter === 'todos' || o.status === orderFilter);
+  const cnt = s => all.filter(o => o.status === s).length;
+  const ids = [...new Set(list.slice(0, 60).flatMap(o => o.photo_ids))];
+  const ph = Object.fromEntries((await api.photosByIds(ids)).map(p => [p.id, p]));
+  const pending = all.filter(o => o.status === 'pendiente').reduce((a, o) => a + +o.total, 0);
+  const approved = all.filter(o => o.status === 'aprobado').reduce((a, o) => a + +o.total, 0);
+  pane.innerHTML = `
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card"><div class="small muted">Vendido (aprobado)</div><div style="font-size:24px;font-weight:800">${money(approved)}</div></div>
+      <div class="card"><div class="small muted">A verificar</div><div style="font-size:24px;font-weight:800;color:var(--warn)">${money(pending)}</div></div>
+    </div>
+    <div class="chips">${[['pendiente', 'Pendientes'], ['aprobado', 'Aprobados'], ['rechazado', 'Rechazados'], ['todos', 'Todos']].map(([k, l]) => `<button class="chip ${orderFilter === k ? 'on' : ''}" data-f="${k}">${l}${k !== 'todos' ? ' (' + cnt(k) + ')' : ''}</button>`).join('')}</div>
+    <div class="card">${list.length ? list.map(o => `
+      <div class="order">
+        <div style="min-width:0">
+          <div class="row"><b>${esc(o.buyer_name)}</b><span class="badge b-${o.status}">${o.status}</span></div>
+          <div class="small muted">${esc(o.events ? o.events.title : '')} · ${fmtDT(o.created_at)}</div>
+          <div style="margin-top:4px"><b style="font-size:18px">${money(o.total)}</b> · ${o.photo_ids.length} fotos
+            ${o.buyer_phone ? ` · <a href="${waLink(o.buyer_phone, 'Hola ' + (o.buyer_name || '').split(' ')[0] + '!')}" target="_blank" rel="noopener">WhatsApp</a>` : ''}
+            ${o.buyer_email ? ` · <span class="small">${esc(o.buyer_email)}</span>` : ''}</div>
+          <div class="thumbs">${o.photo_ids.slice(0, 12).map(id => ph[id] ? `<img src="${api.thumb(ph[id])}" title="${esc(ph[id].file_name || '')}" alt="">` : '').join('')}${o.photo_ids.length > 12 ? `<span class="small muted">+${o.photo_ids.length - 12}</span>` : ''}</div>
+          ${o.photo_ids.length ? `<div class="small muted" style="margin-top:4px">Archivos: ${o.photo_ids.map(id => ph[id] && ph[id].file_name).filter(Boolean).slice(0, 20).map(esc).join(', ')}</div>` : ''}
+          ${o.note ? `<div class="small" style="margin-top:4px">Nota: ${esc(o.note)}</div>` : ''}
+        </div>
+        <div class="acts">
+          ${(o.receipt_path || o.receipt) ? `<button class="btn sm ghost" data-rc="${o.id}">Ver comprobante</button>` : ''}
+          ${o.status !== 'aprobado' ? `<button class="btn sm ok" data-ap="${o.id}">Aprobar</button>` : `<button class="btn sm ghost" data-wa="${o.id}">Reenviar link</button>`}
+          ${o.status === 'pendiente' ? `<button class="btn sm bad" data-rj="${o.id}">Rechazar</button>` : ''}
+        </div>
+      </div>`).join('') : '<div class="empty">No hay pedidos en esta lista.</div>'}</div>`;
+  $$('.chip', pane).forEach(b => b.onclick = () => { orderFilter = b.dataset.f; adminOrders(pane); });
+  const byId = id => all.find(o => o.id === id);
+  const notifyBuyer = o => {
+    const link = baseUrl() + '#/pedido/' + o.token;
+    if (o.buyer_phone) window.open(waLink(o.buyer_phone, `Hola ${(o.buyer_name || '').split(' ')[0]}! Tu pago fue aprobado ✅ Descargá tus ${o.photo_ids.length} fotos en alta calidad acá: ${link} (el link funciona por 30 días)`), '_blank');
+    else copy(link);
+  };
+  $$('[data-rc]', pane).forEach(b => b.onclick = async () => {
+    const o = byId(b.dataset.rc); const w = window.open('', '_blank');
+    try { const url = await api.receiptUrl(o.receipt_path || o.receipt); if (w) w.location = url; else location.href = url; } catch (e) { if (w) w.close(); toast(e.message); }
+  });
+  $$('[data-ap]', pane).forEach(b => b.onclick = async () => {
+    const o = byId(b.dataset.ap);
+    if (!confirm(`¿Confirmás que recibiste ${money(o.total)} de ${o.buyer_name}? Revisalo en tu home banking, no solo en el comprobante.`)) return;
+    await api.setOrder(o.id, { status: 'aprobado', approved_at: new Date().toISOString(), note: null });
+    toast('Pedido aprobado'); notifyBuyer(o); adminOrders(pane);
+  });
+  $$('[data-wa]', pane).forEach(b => b.onclick = () => notifyBuyer(byId(b.dataset.wa)));
+  $$('[data-rj]', pane).forEach(b => b.onclick = async () => {
+    const o = byId(b.dataset.rj); const note = prompt('Motivo del rechazo (lo ve el cliente):', 'No encontramos la transferencia');
+    if (note === null) return;
+    await api.setOrder(o.id, { status: 'rechazado', note });
+    if (o.buyer_phone && confirm('¿Avisarle por WhatsApp?')) window.open(waLink(o.buyer_phone, `Hola ${(o.buyer_name || '').split(' ')[0]}, no pudimos verificar el pago de tu pedido: ${note}. Mirá el detalle acá: ${baseUrl()}#/pedido/${o.token}`), '_blank');
+    adminOrders(pane);
+  });
+}
+
+function eventForm(e = {}) {
+  return `<form class="card" id="evf" style="margin-bottom:14px">
+    <h3>${e.id ? 'Editar evento' : 'Nuevo evento'}</h3>
+    <label class="f"><span>Título *</span><input type="text" name="title" value="${esc(e.title || '')}" required placeholder="Copa Paraná SUP — Fecha 4"></label>
+    <div class="grid2">
+      <label class="f"><span>Tipo</span><select name="kind"><option value="competencia" ${e.kind !== 'evento' ? 'selected' : ''}>Competencia</option><option value="evento" ${e.kind === 'evento' ? 'selected' : ''}>Evento</option></select></label>
+      <label class="f"><span>Fecha</span><input type="date" name="date" value="${esc(e.date || '')}"></label>
+      <label class="f"><span>Lugar</span><input type="text" name="location" value="${esc(e.location || '')}"></label>
+      <label class="f"><span>Precio por foto (vacío = general)</span><input type="number" name="price_photo" min="0" step="100" value="${e.price_photo ?? ''}"></label>
+    </div>
+    <label class="switch"><input type="checkbox" name="published" ${e.published ? 'checked' : ''}> Publicado (visible para el público)</label>
+    <div class="row"><button class="btn">Guardar</button>${e.id ? '<button type="button" class="btn bad sm" id="evdel">Eliminar evento</button>' : ''}</div>
+  </form>`;
+}
+function readEventForm(f, base = {}) {
+  return { ...base, title: f.title.value.trim(), kind: f.kind.value, date: f.date.value || null, location: f.location.value.trim() || null, price_photo: f.price_photo.value === '' ? null : +f.price_photo.value, published: f.published.checked };
+}
+async function adminEvents(pane) {
+  const evs = await api.events();
+  pane.innerHTML = `<details ${evs.length ? '' : 'open'}><summary class="btn accent" style="margin-bottom:12px;list-style:none">+ Nuevo evento</summary>${eventForm()}</details>
+    <div class="card">${evs.length ? evs.map(e => `
+      <div class="order" style="grid-template-columns:auto 1fr auto;align-items:center">
+        <div style="width:72px;height:48px;border-radius:6px;background:#dde3e9 center/cover url('${api.cover(e)}')"></div>
+        <div><b>${esc(e.title)}</b><div class="small muted">${esc(fmtDate(e.date))} · ${e.kind} · ${e.published ? '<span style="color:var(--ok)">Publicado</span>' : 'Borrador'}</div></div>
+        <a class="btn sm" href="#/admin/evento/${e.id}">Gestionar</a>
+      </div>`).join('') : '<div class="empty">Creá tu primer evento.</div>'}</div>`;
+  $('#evf').onsubmit = async ev => {
+    ev.preventDefault(); const n = await api.saveEvent(readEventForm(ev.target));
+    location.hash = '#/admin/evento/' + n.id;
+  };
+}
+
+async function adminEvent(id) {
+  const app = $('#app');
+  const ev = await api.event(id); if (!ev) { app.innerHTML = '<div class="wrap empty">Evento no encontrado</div>'; return; }
+  const photos = await getPhotos(id, true);
+  app.innerHTML = `<div class="wrap" style="padding-top:16px;padding-bottom:40px">
+    <a href="#/admin" class="small" onclick="adminTab='eventos'">← Volver al panel</a>
+    <h1 style="margin-top:8px">${esc(ev.title)}</h1>
+    ${eventForm(ev)}
+    <div class="card" style="margin-bottom:14px">
+      <h3>Subir fotos</h3>
+      <p class="small muted" style="margin-top:-4px">Se suben los originales a un depósito privado y se generan automáticamente la miniatura y la vista con marca de agua "<b>${esc(wmText())}</b>".</p>
+      <div class="grid2">
+        <label class="f"><span>Momento / etiqueta para esta tanda</span><input type="text" id="upTag" placeholder="Largada, Boya 1, Llegada, Podio…"></label>
+        <label class="f"><span>Dorsal para esta tanda (opcional)</span><input type="text" id="upBib" placeholder="Ej: 117"></label>
+      </div>
+      <label class="btn accent" style="cursor:pointer">📤 Elegir fotos<input type="file" id="upF" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
+      <div id="upS" class="hidden"><div class="progress"><i id="upP"></i></div><div class="small muted" id="upT"></div></div>
+    </div>
+    <div class="card">
+      <div class="row" style="margin-bottom:10px"><h3 style="margin:0">${photos.length} fotos</h3><span class="sp"></span><a class="btn sm ghost" href="#/evento/${ev.id}" target="_blank">Ver como cliente</a></div>
+      <p class="small muted" style="margin-top:0">Cargá los dorsales separados por coma (ej: <code>112, 140</code>). Se guarda solo al salir del campo.</p>
+      <div class="aph">${photos.map(p => `
+        <div class="it" data-id="${p.id}"><img src="${api.thumb(p)}" alt="" loading="lazy">
+          <div class="b">
+            <input type="text" data-k="bibs" inputmode="numeric" placeholder="Dorsales" value="${esc((p.bibs || []).join(', '))}">
+            <input type="text" data-k="tag" placeholder="Etiqueta" value="${esc(p.tag || '')}">
+            <div class="row"><span class="small muted" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.file_name || '')}</span>
+            <button class="btn sm ghost" data-cov title="Usar como portada">★</button><button class="btn sm ghost" data-del title="Eliminar">🗑</button></div>
+          </div></div>`).join('')}</div>
+    </div></div>`;
+  const f = $('#evf');
+  f.onsubmit = async e => { e.preventDefault(); const saved = await api.saveEvent(readEventForm(f, { id: ev.id, cover_path: ev.cover_path, cover_id: ev.cover_id })); evCache[id] = saved || null; toast('Evento guardado'); };
+  $('#evdel').onclick = async () => {
+    if (!confirm(`¿Eliminar "${ev.title}" y sus ${photos.length} fotos? No se puede deshacer.`)) return;
+    await api.deleteEvent(ev, photos); delete evCache[id]; delete phCache[id]; adminTab = 'eventos'; location.hash = '#/admin';
+  };
+  $$('.aph .it', app).forEach(it => {
+    const p = photos.find(x => x.id === it.dataset.id);
+    $$('input', it).forEach(inp => inp.onchange = async () => {
+      const patch = inp.dataset.k === 'bibs' ? { bibs: inp.value.split(/[,\s]+/).map(digits).filter(Boolean) } : { tag: inp.value.trim() || null };
+      await api.updatePhoto(p.id, patch); Object.assign(p, patch); toast('Guardado', 1200);
+    });
+    $('[data-del]', it).onclick = async () => { if (!confirm('¿Eliminar esta foto?')) return; await api.deletePhoto(p); it.remove(); delete phCache[id]; };
+    $('[data-cov]', it).onclick = async () => { await api.saveEvent({ ...ev, cover_path: p.thumb_path || null, cover_id: p.id }); ev.cover_path = p.thumb_path; ev.cover_id = p.id; delete evCache[id]; toast('Portada actualizada'); };
+  });
+  $('#upF').onchange = async e => {
+    const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    if (!files.length) return;
+    const tag = $('#upTag').value.trim(), bibs = $('#upBib').value.split(/[,\s]+/).map(digits).filter(Boolean);
+    $('#upS').classList.remove('hidden');
+    let done = 0, fail = 0, first = null; const start = photos.length, total = files.length;
+    const upd = () => { $('#upP').style.width = (done / total * 100) + '%'; $('#upT').textContent = `${done} de ${total} subidas${fail ? ` · ${fail} con error` : ''}… no cierres esta pestaña.`; };
+    upd();
+    let next = 0;
+    const worker = async () => {
+      while (next < files.length) {
+        const i = next++, file = files[i];
+        try {
+          const v = await makeVersions(file, wmText());
+          const p = await api.addPhoto(id, file, v, { tag, bibs, sort: start + i });
+          if (!first) first = p;
+        } catch (ex) { console.error(ex); fail++; }
+        done++; upd();
+      }
+    };
+    await Promise.all([worker(), worker(), worker()]);
+    if (first && !ev.cover_path && !ev.cover_id) await api.saveEvent({ ...ev, cover_path: first.thumb_path || null, cover_id: first.id });
+    delete evCache[id];
+    toast(`Listo: ${done - fail} fotos subidas${fail ? `, ${fail} fallaron` : ''}`, 3500);
+    adminEvent(id);
+  };
+}
+
+async function adminLive(pane) {
+  const sch = await api.schedule();
+  pane.innerHTML = `
+    <form class="card" id="lvf" style="margin-bottom:14px">
+      <h3>Transmisión actual</h3>
+      <p class="small muted" style="margin-top:-4px">Pegá el link del vivo de YouTube (o el ID del canal, que empieza con "UC"). Con otros servicios se muestra un botón al link.</p>
+      <label class="switch"><input type="checkbox" name="live_active" ${SET.live_active ? 'checked' : ''}> <span>Estoy transmitiendo AHORA</span></label>
+      <label class="f"><span>Título</span><input type="text" name="live_title" value="${esc(SET.live_title || '')}" placeholder="Copa Paraná SUP — Fecha 4, Largada Élite"></label>
+      <label class="f"><span>Link del vivo</span><input type="url" name="live_url" value="${esc(SET.live_url || '')}" placeholder="https://www.youtube.com/live/XXXXXXXXXXX"></label>
+      <button class="btn">Guardar</button>
+    </form>
+    <div class="card">
+      <h3>Agenda</h3>
+      <ul class="sched">${sch.map(s => `<li><div style="flex:1"><b>${esc(s.title)}</b><div class="small muted">${fmtDT(s.starts_at)}</div></div><button class="btn sm ghost" data-d="${s.id}">🗑</button></li>`).join('') || '<li class="muted">Sin fechas.</li>'}</ul>
+      <form id="scf" class="grid2" style="margin-top:12px">
+        <label class="f"><span>Título</span><input type="text" name="title" required></label>
+        <label class="f"><span>Fecha y hora</span><input type="datetime-local" name="at" required></label>
+        <div><button class="btn sm">+ Agregar fecha</button></div>
+      </form>
+    </div>`;
+  $('#lvf').onsubmit = async e => {
+    e.preventDefault(); const f = e.target;
+    const patch = { live_active: f.live_active.checked, live_title: f.live_title.value.trim(), live_url: f.live_url.value.trim() };
+    if (patch.live_active && !patch.live_url) return toast('Cargá el link del vivo');
+    SET = { ...SET, ...(await api.saveSettings(patch) || patch) }; renderChrome(); toast('Guardado');
+  };
+  $('#scf').onsubmit = async e => { e.preventDefault(); await api.addSchedule({ title: e.target.title.value.trim(), starts_at: new Date(e.target.at.value).toISOString() }); adminLive(pane); };
+  $$('[data-d]', pane).forEach(b => b.onclick = async () => { await api.delSchedule(b.dataset.d); adminLive(pane); });
+}
+
+async function adminSettings(pane) {
+  const s = SET;
+  const fld = (k, l, t = 'text', ph = '') => `<label class="f"><span>${l}</span><input type="${t}" name="${k}" value="${esc(s[k] ?? '')}" placeholder="${esc(ph)}" ${t === 'number' ? 'min="0" step="100"' : ''}></label>`;
+  pane.innerHTML = `<form class="card" id="stf">
+    <h3>Marca</h3>
+    <div class="grid2">${fld('site_name', 'Nombre de la marca')}${fld('watermark_text', 'Texto de marca de agua', 'text', '© ' + (s.site_name || ''))}</div>
+    <label class="f"><span>Frase de portada</span><textarea name="tagline" rows="2">${esc(s.tagline || '')}</textarea></label>
+    <div class="grid2">${fld('instagram', 'Instagram (usuario)')}${fld('whatsapp', 'WhatsApp (con 549…)', 'tel', '5493411234567')}</div>
+    ${fld('youtube', 'Canal de YouTube (URL)', 'url')}
+    <h3 style="margin-top:10px">Cobro por transferencia</h3>
+    <div class="grid2">${fld('alias', 'Alias')}${fld('cbu', 'CBU / CVU')}</div>
+    ${fld('titular', 'Titular de la cuenta')}
+    <h3 style="margin-top:10px">Precios</h3>
+    <div class="grid2">${fld('price_photo', 'Precio por foto', 'number')}<div></div>${fld('pack_size', 'Fotos por pack (opcional)', 'number')}${fld('pack_price', 'Precio del pack', 'number')}</div>
+    <p class="small muted" style="margin-top:-4px">Ejemplo con los valores actuales: 7 fotos = ${money(calcTotal(7, s))}. Fórmula: el mínimo entre (packs completos + sueltas) y (redondear para arriba a packs).</p>
+    <button class="btn">Guardar ajustes</button>
+  </form>`;
+  $('#stf').onsubmit = async e => {
+    e.preventDefault(); const f = e.target, o = {};
+    ['site_name', 'watermark_text', 'tagline', 'instagram', 'whatsapp', 'youtube', 'alias', 'cbu', 'titular'].forEach(k => o[k] = f[k].value.trim() || null);
+    o.whatsapp = o.whatsapp ? digits(o.whatsapp) : null;
+    ['price_photo', 'pack_size', 'pack_price'].forEach(k => o[k] = f[k].value === '' ? (k === 'price_photo' ? 0 : null) : +f[k].value);
+    SET = { ...SET, ...(await api.saveSettings(o) || o) }; renderChrome(); toast('Ajustes guardados');
+  };
+}
+
+/* =====================================================================
+   ROUTER
+   ===================================================================== */
+async function route() {
+  const raw = (location.hash || '#/').slice(1);
+  const [path, qs] = raw.split('?');
+  const parts = path.split('/').filter(Boolean);
+  window.scrollTo(0, 0);
+  $('#app').innerHTML = '<div class="spin"></div>';
+  renderNav(); updateCartUI();
+  try {
+    if (!parts.length) await viewHome();
+    else if (parts[0] === 'evento' && parts[1]) await viewEvent(parts[1]);
+    else if (parts[0] === 'carrito') await viewCart();
+    else if (parts[0] === 'pedido' && parts[1]) await viewOrder(parts[1], /nuevo=1/.test(qs || ''));
+    else if (parts[0] === 'vivo') await viewLive();
+    else if (parts[0] === 'admin') await viewAdmin(parts.slice(1).join('/'));
+    else await viewHome();
+  } catch (e) {
+    console.error(e);
+    $('#app').innerHTML = `<div class="wrap empty"><h2>Algo salió mal</h2><p>${esc(e.message)}</p><a class="btn" href="#/">Volver al inicio</a></div>`;
+  }
+  updateCartUI();
+}
+window.addEventListener('hashchange', route);
+
+(async () => {
+  if (DEMO) $('#demoStrip').classList.remove('hidden');
+  try { SET = await api.settings(); } catch (e) { console.error(e); SET = {}; }
+  renderChrome();
+  route();
+})();
+</script>
+</body>
+</html>
