@@ -23,7 +23,7 @@ exports.handler = async (e) => {
     if (!b.receipt || !b.receipt.data || !EXT[b.receipt.type])
       return json(400, { error: 'Falta el comprobante (JPG, PNG, WEBP o PDF)' });
 
-    const [ev] = await q(`events?id=eq.${b.event_id}&published=eq.true&select=id,price_photo`);
+    const [ev] = await q(`events?id=eq.${b.event_id}&published=eq.true&select=id,price_photo,pack_size,pack_price`);
     if (!ev) return json(404, { error: 'Evento no encontrado' });
 
     const photos = await q(`photos?event_id=eq.${ev.id}&id=in.(${ids.join(',')})&select=id`);

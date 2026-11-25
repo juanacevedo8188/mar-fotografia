@@ -66,6 +66,11 @@ create table if not exists events (
   created_at timestamptz default now()
 );
 
+-- Precios propios de cada evento (si quedan vacíos, se usan los de Ajustes).
+-- pack_size = 0 significa "sin pack".
+alter table events add column if not exists pack_size int;
+alter table events add column if not exists pack_price numeric;
+
 -- ---------- Fotos ----------
 create table if not exists photos (
   id uuid primary key default gen_random_uuid(),

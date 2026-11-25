@@ -20,12 +20,14 @@ async function q(path, opt = {}) {
   return t ? JSON.parse(t) : null;
 }
 
-// Misma fórmula que el front:
+// Misma regla que el front: cada evento tiene sus precios y, si falta
+// alguno, se usa el valor por defecto de Ajustes. Pack de 0 = sin pack.
 // total = min( floor(n/k)·P + (n mod k)·p , ceil(n/k)·P )
 function calcTotal(n, s, ev) {
-  const p = ev && ev.price_photo != null ? +ev.price_photo : +s.price_photo || 0;
-  const k = +s.pack_size || 0;
-  const P = +s.pack_price || 0;
+  const pick = (key) => (ev && ev[key] != null ? +ev[key] : +s[key] || 0);
+  const p = pick('price_photo');
+  const k = pick('pack_size');
+  const P = pick('pack_price');
   if (k > 1 && P > 0) {
     const mixed = Math.floor(n / k) * P + (n % k) * p;
     const allPacks = Math.ceil(n / k) * P;

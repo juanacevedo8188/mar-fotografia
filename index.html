@@ -312,18 +312,22 @@ const ICON = {
   user: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>'
 };
 
-/* Precio: total = min( ⌊n/k⌋·P + (n mod k)·p , ⌈n/k⌉·P ) — igual que en el servidor */
+/* Precios de un evento: cada evento tiene los suyos; si falta alguno,
+   se usa el valor por defecto de Ajustes. Pack de 0 fotos = sin pack. */
+function evPrices(ev, s = SET) {
+  const pick = k => ev && ev[k] != null && ev[k] !== '' ? +ev[k] : +s[k] || 0;
+  const p = pick('price_photo'), k = pick('pack_size'), P = pick('pack_price');
+  return { p, k, P, hasPack: k > 1 && P > 0 };
+}
+/* Total: min( ⌊n/k⌋·P + (n mod k)·p , ⌈n/k⌉·P ) — igual que en el servidor */
 function calcTotal(n, s, ev) {
-  const p = ev && ev.price_photo != null && ev.price_photo !== '' ? +ev.price_photo : +s.price_photo || 0;
-  const k = +s.pack_size || 0, P = +s.pack_price || 0;
-  if (k > 1 && P > 0) return Math.min(Math.floor(n / k) * P + (n % k) * p, Math.ceil(n / k) * P);
+  const { p, k, P, hasPack } = evPrices(ev, s);
+  if (hasPack) return Math.min(Math.floor(n / k) * P + (n % k) * p, Math.ceil(n / k) * P);
   return n * p;
 }
 function priceText(s, ev) {
-  const p = ev && ev.price_photo != null && ev.price_photo !== '' ? +ev.price_photo : +s.price_photo || 0;
-  let t = money(p) + ' por foto';
-  if (+s.pack_size > 1 && +s.pack_price > 0) t += ` · Pack ${s.pack_size} fotos ${money(s.pack_price)}`;
-  return t;
+  const { p, k, P, hasPack } = evPrices(ev, s);
+  return money(p) + ' por foto' + (hasPack ? ` · Pack ${k} fotos ${money(P)}` : '');
 }
 
 /* ---------- imagen: resize + marca de agua (en el navegador del fotógrafo) ---------- */
@@ -772,7 +776,7 @@ async function viewHome() {
     ${visible.length ? `<div class="events">${visible.map(e => `
       <a class="ev" href="#/evento/${e.id}">
         <div class="cov" style="background-image:url('${api.cover(e)}')"><span class="kind">${e.kind === 'competencia' ? 'Competencia' : 'Evento'}</span></div>
-        <div class="bd"><h3>${esc(e.title)}</h3><div class="muted small">${esc(fmtDate(e.date))}${e.location ? ' · ' + esc(e.location) : ''}</div></div>
+        <div class="bd"><h3>${esc(e.title)}</h3><div class="muted small">${esc(fmtDate(e.date))}${e.location ? ' · ' + esc(e.location) : ''}</div><div class="small" style="margin-top:4px;font-weight:650">${esc(priceText(SET, e))}</div></div>
       </a>`).join('')}</div>` : `<div class="empty card"><h3>Muy pronto, las primeras fotos</h3><p style="margin:0">Acá vas a encontrar las galerías de cada competencia y evento.${SET.instagram ? ` Mientras tanto, seguime en <a href="https://instagram.com/${esc(SET.instagram.replace('@', ''))}" target="_blank" rel="noopener">@${esc(SET.instagram.replace('@', ''))}</a>.` : ''}</p></div>`}
   </div></section>
   ${SET.about_text ? `<section class="section" style="padding-top:0"><div class="wrap"><a class="card teaser" href="#/quien-soy" style="text-decoration:none;color:inherit">
@@ -915,7 +919,7 @@ async function viewCart() {
   const [ev, photos] = await Promise.all([getEvent(cart.eventId), getPhotos(cart.eventId)]);
   const sel = photos.filter(p => cart.ids.includes(p.id));
   if (sel.length !== cart.ids.length) { cart.ids = sel.map(p => p.id); saveCart(); }
-  const n = sel.length, total = calcTotal(n, SET, ev), unit = ev.price_photo != null && ev.price_photo !== '' ? +ev.price_photo : +SET.price_photo;
+  const n = sel.length, total = calcTotal(n, SET, ev), pr = evPrices(ev), unit = pr.p;
   const saving = n * unit - total;
   app.innerHTML = `
   <div class="wrap" style="padding-top:20px;padding-bottom:30px">
@@ -929,7 +933,7 @@ async function viewCart() {
           <div class="sum"><span>${n} × ${money(unit)}</span><span>${money(n * unit)}</span></div>
           ${saving > 0 ? `<div class="sum" style="color:var(--ok)"><span>Descuento por pack</span><span>−${money(saving)}</span></div>` : ''}
           <div class="sum tot"><span>Total</span><span>${money(total)}</span></div>
-          ${+SET.pack_size > 1 && +SET.pack_price > 0 && n % SET.pack_size && saving >= 0 ? `<div class="small muted">Tip: con ${SET.pack_size - (n % SET.pack_size)} foto(s) más completás otro pack de ${SET.pack_size} por ${money(SET.pack_price)}.</div>` : ''}
+          ${pr.hasPack && n % pr.k && saving >= 0 ? `<div class="small muted">Tip: con ${pr.k - (n % pr.k)} foto(s) más completás otro pack de ${pr.k} por ${money(pr.P)}.</div>` : ''}
         </div>
       </div>
       <form class="card" id="chk" novalidate>
@@ -1069,8 +1073,12 @@ const BOT = {
     }).filter(f => f.q && f.a);
   },
   fill(a) {
-    const p = +SET.price_photo || 0, k = +SET.pack_size || 0, P = +SET.pack_price || 0;
-    const precios = (p ? `Cada foto sale ${money(p)}.` : 'El precio figura en cada evento.') + (k > 1 && P ? ` Pack de ${k} fotos: ${money(P)} (${money(P / k)} por foto).` : '') + ' Algunos eventos pueden tener un precio distinto: lo ves arriba de cada galería.';
+    const line = ev => { const x = evPrices(ev); return `${money(x.p)} por foto` + (x.hasPack ? ` · pack de ${x.k} por ${money(x.P)} (${money(x.P / x.k)} c/u)` : ''); };
+    const cur = (location.hash.match(/^#\/evento\/([\w-]+)/) || [])[1], ce = cur && evCache[cur];
+    const evs = (this._events || []).filter(e => e.published);
+    const precios = ce ? `En ${ce.title}: ${line(ce)}.`
+      : evs.length ? 'Los precios cambian según el evento:\n' + evs.slice(0, 6).map(e => `• ${e.title}: ${line(e)}`).join('\n') + (evs.length > 6 ? '\n…y el resto los ves arriba de cada galería.' : '')
+      : 'Los precios cambian según el evento y figuran arriba de cada galería.';
     const ig = (SET.instagram || '').replace('@', '');
     return a.replace(/\{precios\}/g, precios)
       .replace(/\{alias\}/g, SET.alias ? `el alias ${SET.alias}` : 'la cuenta que figura al confirmar el pedido')
@@ -1119,6 +1127,7 @@ const BOT = {
       const name = (SET.site_name || '').split(' ')[0];
       this.push('b', `¡Hola! 👋 Soy el asistente de ${esc(SET.site_name || 'la web')}. Elegí una pregunta o escribí la tuya.`);
       try { this._next = (await api.schedule()).find(x => new Date(x.starts_at) > Date.now()); } catch {}
+      try { this._events = await api.events(); } catch {}
       const mine = store.get('my_orders', []);
       if (mine.length) this.log.push({ who: 'b', html: 'Tus pedidos desde este dispositivo:<br>' + mine.slice(0, 3).map(o => `<a href="#/pedido/${esc(o.token)}">${esc(o.event)} · ${o.n} fotos</a>`).join('<br>') });
     }
@@ -1275,14 +1284,24 @@ function eventForm(e = {}) {
       <label class="f"><span>Tipo</span><select name="kind"><option value="competencia" ${e.kind !== 'evento' ? 'selected' : ''}>Competencia</option><option value="evento" ${e.kind === 'evento' ? 'selected' : ''}>Evento</option></select></label>
       <label class="f"><span>Fecha</span><input type="date" name="date" value="${esc(e.date || '')}"></label>
       <label class="f"><span>Lugar</span><input type="text" name="location" value="${esc(e.location || '')}"></label>
-      <label class="f"><span>Precio por foto (vacío = general)</span><input type="number" name="price_photo" min="0" step="1" value="${e.price_photo ?? ''}"></label>
     </div>
+    <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <label class="f"><span>Precio por foto</span><input type="number" name="price_photo" min="0" step="1" value="${e.id ? (e.price_photo ?? '') : (SET.price_photo ?? '')}"></label>
+      <label class="f"><span>Fotos por pack (0 = sin pack)</span><input type="number" name="pack_size" min="0" step="1" value="${e.id ? (e.pack_size ?? '') : (SET.pack_size ?? '')}"></label>
+      <label class="f"><span>Precio del pack</span><input type="number" name="pack_price" min="0" step="1" value="${e.id ? (e.pack_price ?? '') : (SET.pack_price ?? '')}"></label>
+    </div>
+    <p class="small muted" style="margin:-4px 0 12px" id="evPx"></p>
     <label class="switch"><input type="checkbox" name="published" ${e.published ? 'checked' : ''}> Publicado (visible para el público)</label>
     <div class="row"><button class="btn">Guardar</button>${e.id ? '<button type="button" class="btn bad sm" id="evdel">Eliminar evento</button>' : ''}</div>
   </form>`;
 }
+function wireEventPrices(f) {
+  const out = $('#evPx', f); if (!out) return;
+  const upd = () => { const ev = readEventForm(f), x = evPrices(ev); out.textContent = `Así lo ve el cliente: ${priceText(SET, ev)}.` + (x.hasPack ? ` Ejemplo: 7 fotos = ${money(calcTotal(7, SET, ev))}.` : ''); };
+  ['price_photo', 'pack_size', 'pack_price'].forEach(k => f[k].addEventListener('input', upd)); upd();
+}
 function readEventForm(f, base = {}) {
-  return { ...base, title: f.title.value.trim(), kind: f.kind.value, date: f.date.value || null, location: f.location.value.trim() || null, price_photo: f.price_photo.value === '' ? null : +f.price_photo.value, published: f.published.checked };
+  return { ...base, title: f.title.value.trim(), kind: f.kind.value, date: f.date.value || null, location: f.location.value.trim() || null, price_photo: f.price_photo.value === '' ? null : +f.price_photo.value, pack_size: f.pack_size.value === '' ? null : +f.pack_size.value, pack_price: f.pack_price.value === '' ? null : +f.pack_price.value, published: f.published.checked };
 }
 async function adminEvents(pane) {
   const evs = await api.events();
@@ -1293,6 +1312,7 @@ async function adminEvents(pane) {
         <div><b>${esc(e.title)}</b><div class="small muted">${esc(fmtDate(e.date))} · ${e.kind} · ${e.published ? '<span style="color:var(--ok)">Publicado</span>' : 'Borrador'}</div></div>
         <a class="btn sm" href="#/admin/evento/${e.id}">Gestionar</a>
       </div>`).join('') : '<div class="empty">Creá tu primer evento.</div>'}</div>`;
+  wireEventPrices($('#evf'));
   $('#evf').onsubmit = async ev => {
     ev.preventDefault(); const n = await api.saveEvent(readEventForm(ev.target));
     location.hash = '#/admin/evento/' + n.id;
@@ -1334,7 +1354,7 @@ async function adminEvent(id) {
             <button class="btn sm ghost" data-cov title="Usar como portada">★</button><button class="btn sm ghost" data-del title="Eliminar">🗑</button></div>
           </div></div>`).join('')}</div>
     </div></div>`;
-  const f = $('#evf');
+  const f = $('#evf'); wireEventPrices(f);
   f.onsubmit = async e => { e.preventDefault(); const saved = await api.saveEvent(readEventForm(f, { id: ev.id, cover_path: ev.cover_path, cover_id: ev.cover_id })); evCache[id] = saved || null; toast('Evento guardado'); };
   $('#evdel').onclick = async () => {
     if (!confirm(`¿Eliminar "${ev.title}" y sus ${photos.length} fotos? No se puede deshacer.`)) return;
@@ -1449,9 +1469,10 @@ async function adminSettings(pane) {
     <h3 style="margin-top:10px">Cobro por transferencia</h3>
     <div class="grid2">${fld('alias', 'Alias')}${fld('cbu', 'CBU / CVU')}</div>
     ${fld('titular', 'Titular de la cuenta')}
-    <h3 style="margin-top:10px">Precios</h3>
+    <h3 style="margin-top:10px">Precios por defecto</h3>
+    <p class="small muted" style="margin-top:-4px">Cada evento tiene sus propios precios. Estos valores solo se precargan al crear un evento nuevo.</p>
     <div class="grid2">${fld('price_photo', 'Precio por foto', 'number')}<div></div>${fld('pack_size', 'Fotos por pack (opcional)', 'number')}${fld('pack_price', 'Precio del pack', 'number')}</div>
-    <p class="small muted" style="margin-top:-4px">Ejemplo con los valores actuales: 7 fotos = ${money(calcTotal(7, s))}. Fórmula: el mínimo entre (packs completos + sueltas) y (redondear para arriba a packs).</p>
+    <p class="small muted" style="margin-top:-4px">Ejemplo: 7 fotos = ${money(calcTotal(7, s, {}))}. Se cobra lo más barato entre (packs completos + sueltas) y (redondear para arriba a packs).</p>
     <button class="btn">Guardar ajustes</button>
   </form>`;
   $('#stf').onsubmit = async e => {
