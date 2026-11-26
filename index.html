@@ -1062,7 +1062,7 @@ const BOT = {
     suben: 'suben', subis: 'suben', subir: 'suben', publican: 'suben', estan: 'suben', fecha: 'suben',
     cobertura: 'cubrir', cubris: 'cubrir', cubrir: 'cubrir', contratar: 'cubrir', presupuesto: 'cubrir', evento: 'cubrir', eventos: 'cubrir', casamiento: 'cubrir', cumple: 'cubrir', cumpleanos: 'cubrir', fiesta: 'cubrir', sesion: 'cubrir',
     vivo: 'vivo', transmision: 'vivo', transmisiones: 'vivo', transmiten: 'vivo', stream: 'vivo', youtube: 'vivo', directo: 'vivo' },
-  norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9ñ\s]/g, ' '); },
+  norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9ñ\s]/g, ' '); },
   tokens(t) {
     return this.norm(t).split(/\s+/).filter(w => w.length > 1 && !this.STOP.has(w))
       .map(w => this.SYN[w] || this.SYN[w.replace(/(es|s)$/, '')] || w.replace(/(es|s)$/, ''));
