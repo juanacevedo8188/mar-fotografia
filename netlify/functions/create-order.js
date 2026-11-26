@@ -35,7 +35,7 @@ exports.handler = async (e) => {
     const buf = Buffer.from(b.receipt.data, 'base64');
     if (buf.length > 4.5 * 1024 * 1024) return json(413, { error: 'El comprobante pesa demasiado (máx. 4,5 MB)' });
 
-    const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${EXT[b.receipt.type]}`;
+    const path = `${new Date().toISOString().slice(0, 10)}/${require('crypto').randomUUID()}.${EXT[b.receipt.type]}`;
     const up = await fetch(`${U}/storage/v1/object/receipts/${path}`, {
       method: 'POST',
       headers: { apikey: K, Authorization: `Bearer ${K}`, 'Content-Type': b.receipt.type },

@@ -149,6 +149,59 @@ create table if not exists live_schedule (
   url text
 );
 
+-- ---------- Módulos (el fotógrafo los prende o apaga en Ajustes) ----------
+alter table settings add column if not exists mod_calendar boolean not null default true;
+alter table settings add column if not exists mod_passes boolean not null default true;
+alter table settings add column if not exists mod_chat boolean not null default true;
+alter table settings add column if not exists mod_selfie boolean not null default true;
+alter table settings add column if not exists mod_live boolean not null default true;
+alter table settings add column if not exists mod_about boolean not null default true;
+
+-- ---------- Pase de fechas ----------
+-- Pase = (Σ precio de cada fecha) × (1 − d), d según la escala "fechas:%"
+alter table settings add column if not exists pass_tiers text default '2:10, 3:15, 4:20';
+alter table settings add column if not exists pass_price_default numeric default 15000;
+alter table settings add column if not exists pass_max_photos int not null default 0;  -- 0 = todas
+alter table settings add column if not exists pass_intro text default
+  'Elegí las fechas a las que vas, pagá una sola vez y asegurate todas tus fotos. Te las mando después de cada fecha, sin que tengas que buscarlas.';
+alter table settings add column if not exists pass_policy text default
+  'Si en alguna fecha no salís en ninguna foto, ese monto te queda como crédito para tu próximo pase.';
+
+alter table events add column if not exists pass_price numeric;              -- vacío = precio por defecto
+alter table events add column if not exists pass_quota int;                  -- vacío = sin límite
+alter table events add column if not exists pass_enabled boolean not null default true;
+
+create table if not exists passes (
+  id uuid primary key default gen_random_uuid(),
+  token text unique not null default encode(gen_random_bytes(18), 'hex'),
+  event_ids uuid[] not null,
+  base numeric,
+  discount numeric,
+  total numeric not null,
+  buyer_name text,
+  buyer_phone text,
+  buyer_email text,
+  bib text,
+  selfie_embedding vector(128),   -- DATO BIOMÉTRICO: solo con consentimiento; sin lectura pública
+  consent boolean not null default false,
+  receipt_path text,
+  status text not null default 'pendiente' check (status in ('pendiente','aprobado','rechazado')),
+  note text,
+  created_at timestamptz default now(),
+  approved_at timestamptz
+);
+create index if not exists passes_events_idx on passes using gin (event_ids);
+alter table orders add column if not exists pass_id uuid references passes on delete set null;
+
+-- Lugares ocupados por fecha (para mostrar el cupo sin exponer los pases)
+create or replace function public.pass_counts() returns table (event_id uuid, n bigint)
+language sql stable security definer set search_path = public as $$
+  select e, count(*) from passes, unnest(event_ids) e
+  where status in ('pendiente','aprobado') group by e
+$$;
+revoke all on function public.pass_counts() from public;
+grant execute on function public.pass_counts() to anon, authenticated;
+
 -- =========================================================
 -- Row Level Security
 -- =========================================================
@@ -159,6 +212,10 @@ alter table photos enable row level security;
 alter table orders enable row level security;
 alter table live_schedule enable row level security;
 alter table faces enable row level security;
+alter table passes enable row level security;
+
+drop policy if exists "passes admin" on passes;
+create policy "passes admin" on passes for all using (is_admin()) with check (is_admin());
 
 drop policy if exists "faces admin" on faces;
 create policy "faces admin" on faces for all using (is_admin()) with check (is_admin());

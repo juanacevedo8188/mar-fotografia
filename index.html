@@ -192,7 +192,7 @@ nav.main a.on,nav.main a:hover{color:var(--brand-ink);background:color-mix(in sr
 .colorrow input[type=color]{width:46px;height:40px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff}
 /* chat de ayuda */
 #bot .fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:bottom .2s}
-.cartbar.show~#bot .fab{bottom:calc(84px + env(safe-area-inset-bottom))}
+body.has-bar #bot .fab,.cartbar.show~#bot .fab{bottom:calc(84px + env(safe-area-inset-bottom))}
 #bot .panel{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:45;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 120px));background:var(--card);border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden}
 .cartbar.show~#bot .panel{bottom:calc(154px + env(safe-area-inset-bottom))}
 @media(max-width:480px){#bot .panel,.cartbar.show~#bot .panel{right:0;left:0;bottom:0;width:100%;height:min(88vh,620px);border-radius:18px 18px 0 0}}
@@ -213,6 +213,24 @@ nav.main a.on,nav.main a:hover{color:var(--brand-ink);background:color-mix(in sr
 #bot form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--card);padding-bottom:calc(10px + env(safe-area-inset-bottom))}
 #bot form input{flex:1;min-height:42px}
 #bot form button{border:0;border-radius:10px;background:var(--brand);color:var(--brand-ink);padding:0 14px;font-weight:700;cursor:pointer}
+/* calendario y pases */
+.cal-month{font-size:13px;font-weight:750;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 8px}
+.cal-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 14px;margin-bottom:8px;border:2px solid transparent}
+label.cal-it{cursor:pointer}
+.cal-it.on{border-color:var(--accent)}
+.cal-it.full{opacity:.6}
+.cal-it .d{background:var(--brand);color:var(--brand-ink);border-radius:10px;padding:6px 10px;text-align:center;min-width:56px;font-weight:800;line-height:1.1}
+.cal-it .d small{display:block;font-weight:600;font-size:11px;opacity:.85;text-transform:uppercase}
+.cal-it .px{text-align:right;font-weight:750;white-space:nowrap}
+.cal-it .px input{width:22px;height:22px;margin-top:6px;accent-color:var(--accent)}
+.badge2{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg);margin:4px 4px 0 0}
+.tiers{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.tiers span{background:color-mix(in srgb,var(--accent) 14%,#fff);color:color-mix(in srgb,var(--accent) 70%,#000);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:700}
+.passbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--brand);color:var(--brand-ink);padding:10px 0 calc(10px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.passbar .wrap{display:flex;align-items:center;gap:12px}
+.pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;max-height:50vh;overflow:auto;padding:2px}
+.pickgrid .ph{aspect-ratio:3/2}
+.modrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2px 14px;margin-bottom:6px}
 footer{padding:28px 0 36px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line);margin-top:20px}
 .spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand2);border-radius:50%;animation:sp .8s linear infinite;margin:40px auto}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -273,7 +291,15 @@ Las subo después de cada fecha. Si todavía no está tu evento, escribime y te 
 Sí: competencias, clínicas, cumpleaños y eventos sociales. Escribime con la fecha, el lugar y el tipo de evento y te paso un presupuesto.
 
 ¿Dónde veo las transmisiones en vivo?
-En la sección "En vivo" de la web. {proxima}`;
+En la sección "En vivo" de la web. {proxima}
+
+¿Qué es el pase de fechas?
+{pase}`;
+const PASS_DEFAULT = {
+  tiers: '2:10, 3:15, 4:20',
+  intro: 'Elegí las fechas a las que vas, pagá una sola vez y asegurate todas tus fotos. Te las mando después de cada fecha, sin que tengas que buscarlas.',
+  policy: 'Si en alguna fecha no salís en ninguna foto, ese monto te queda como crédito para tu próximo pase.'
+};
 const ABOUT_DEFAULT = {
   tags: 'Competencias de SUP, Eventos, Transmisiones en vivo',
   text: 'Soy fotógrafo independiente. Recorro las competencias de stand up paddle para que cada remador tenga sus mejores fotos, y también cubro eventos sociales y deportivos.\n\nAdemás transmito en vivo las competencias, para que familia y amigos las sigan desde donde estén.\n\nSi querés que cubra tu evento, escribime y lo charlamos.'
@@ -325,6 +351,33 @@ function calcTotal(n, s, ev) {
   if (hasPack) return Math.min(Math.floor(n / k) * P + (n % k) * p, Math.ceil(n / k) * P);
   return n * p;
 }
+/* ---------- Módulos que el fotógrafo prende o apaga desde Ajustes ---------- */
+const MODULES = [
+  ['calendar', 'Calendario de fechas'], ['passes', 'Pase de fechas (abonos)'], ['chat', 'Chat de ayuda'],
+  ['selfie', 'Búsqueda por selfie'], ['live', 'Transmisiones en vivo'], ['about', 'Quién soy']
+];
+const mod = k => (k === 'passes' ? SET.mod_passes !== false && SET.mod_calendar !== false : SET['mod_' + k] !== false);
+const todayISO = () => new Date().toLocaleDateString('sv-SE'); // AAAA-MM-DD en hora local
+
+/* ---------- Pase de fechas ----------
+   Precio de cada fecha en el pase: el del evento o, si está vacío, el de Ajustes.
+   Pase = (Σ precios) × (1 − d), con d según la escala "fechas:descuento%" */
+function passTiers(s = SET) {
+  return String(s.pass_tiers || '').split(/[,;\n]+/).map(t => t.split(':').map(x => parseFloat(String(x).replace('%', ''))))
+    .filter(([n, d]) => n >= 1 && d >= 0 && d < 100).sort((a, b) => a[0] - b[0]);
+}
+function passPrice(e, s = SET) { return e && e.pass_price != null && e.pass_price !== '' ? +e.pass_price : +s.pass_price_default || 0; }
+function passTotal(evs, s = SET) {
+  const base = evs.reduce((a, e) => a + passPrice(e, s), 0);
+  let d = 0; for (const [n, pct] of passTiers(s)) if (evs.length >= n) d = pct;
+  return { base, discount: d, total: Math.round(base * (1 - d / 100)) };
+}
+function tiersText(s = SET) { return passTiers(s).map(([n, d]) => `${n}${n === passTiers(s).slice(-1)[0][0] ? '+' : ''} fechas −${d}%`); }
+function passIncludes(s = SET) { const m = +s.pass_max_photos || 0; return m > 0 ? `hasta ${m} fotos tuyas por fecha` : 'todas tus fotos de cada fecha'; }
+const parseVec = v => Array.isArray(v) ? v : (typeof v === 'string' && v.startsWith('[') ? JSON.parse(v) : null);
+const pl = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+const makeToken = () => Array.from({ length: 36 }, () => '0123456789abcdef'[Math.random() * 16 | 0]).join('');
+
 function priceText(s, ev) {
   const { p, k, P, hasPack } = evPrices(ev, s);
   return money(p) + ' por foto' + (hasPack ? ` · Pack ${k} fotos ${money(P)}` : '');
@@ -582,6 +635,32 @@ const liveApi = {
     await sb.q(`photos?id=eq.${p.id}`, { method: 'DELETE' });
   },
   async uploadBrand(blob, kind) { const path = `brand/${kind}-${Date.now()}.${blob.type === 'image/png' ? 'png' : 'jpg'}`; await sb.upload('previews', path, blob); return sb.pub(path); },
+  /* ---------- pases ---------- */
+  async createPass(body) {
+    const r = await fetch('/.netlify/functions/create-pass', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'No se pudo crear el pase'); return j;
+  },
+  async pass(token) {
+    const r = await fetch('/.netlify/functions/pass-status?token=' + encodeURIComponent(token));
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Pase no encontrado'); return j;
+  },
+  passes() { return sb.q('passes?select=*&order=created_at.desc&limit=300'); },
+  setPass(id, patch) { return sb.q(`passes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(patch) }); },
+  async passCounts() { try { const r = await sb.q('rpc/pass_counts', { method: 'POST', body: '{}' }); return Object.fromEntries((r || []).map(x => [x.event_id, +x.n])); } catch { return {}; } },
+  passHolders(eid) { return sb.q(`passes?status=eq.aprobado&event_ids=cs.{${eid}}&select=*&order=buyer_name.asc`); },
+  async eventFaces(eid) {
+    const out = [];
+    for (let off = 0; ; off += 1000) {
+      const page = await sb.q(`faces?event_id=eq.${eid}&select=photo_id,embedding&order=id.asc&limit=1000&offset=${off}`);
+      page.forEach(f => out.push({ photo_id: f.photo_id, embedding: parseVec(f.embedding) }));
+      if (page.length < 1000) return out;
+    }
+  },
+  async deliverPass(ps, ev, ids) {
+    const [o] = await sb.q('orders', { method: 'POST', body: JSON.stringify({ event_id: ev.id, photo_ids: ids, total: 0, buyer_name: ps.buyer_name, buyer_phone: ps.buyer_phone, buyer_email: ps.buyer_email, status: 'aprobado', approved_at: new Date().toISOString(), pass_id: ps.id, note: 'Pase de fechas' }) });
+    return o.token;
+  },
+  passDeliveries(eid) { return sb.q(`orders?event_id=eq.${eid}&pass_id=not.is.null&select=pass_id,token,photo_ids`); },
   async saveSettings(s) { const [r] = await sb.q('settings?id=eq.1', { method: 'PATCH', body: JSON.stringify({ ...strip(s, ['id']), updated_at: new Date().toISOString() }) }); return r; },
   async addSchedule(x) { const [r] = await sb.q('live_schedule', { method: 'POST', body: JSON.stringify(x) }); return r; },
   delSchedule(id) { return sb.q(`live_schedule?id=eq.${id}`, { method: 'DELETE' }); }
@@ -597,9 +676,11 @@ const demo = (() => {
     whatsapp: '5493416561946', instagram: 'm.a.r_fotografia', faq: FAQ_DEFAULT, youtube: '', price_photo: 3500, pack_size: 5, pack_price: 12000,
     live_active: false, live_title: '', live_url: '',
     color_primary: '#0b2540', color_accent: '#ff5a36', logo_url: '',
-    about_title: 'Quién soy', about_photo_url: '', about_tags: ABOUT_DEFAULT.tags, about_text: ABOUT_DEFAULT.text
+    about_title: 'Quién soy', about_photo_url: '', about_tags: ABOUT_DEFAULT.tags, about_text: ABOUT_DEFAULT.text,
+    mod_calendar: true, mod_passes: true, mod_chat: true, mod_selfie: true, mod_live: true, mod_about: true,
+    pass_tiers: PASS_DEFAULT.tiers, pass_price_default: 15000, pass_max_photos: 0, pass_intro: PASS_DEFAULT.intro, pass_policy: PASS_DEFAULT.policy
   };
-  const E = [], P = [], SCH = [];
+  const E = [], P = [], SCH = [], PS = [];
   const O = store.get('demo_orders', []);
   const cache = {};
   const img = (p, kind) => {
@@ -618,7 +699,7 @@ const demo = (() => {
     cover: e => { const p = P.find(x => x.id === e.cover_id) || P.find(x => x.event_id === e.id); return p ? img(p, 't') : ''; },
     async createOrder(b) {
       const ev = E.find(e => e.id === b.event_id);
-      const o = { id: uid(), token: Array.from({ length: 36 }, () => '0123456789abcdef'[Math.random() * 16 | 0]).join(''), event_id: b.event_id, events: { title: ev.title }, photo_ids: b.photo_ids, total: calcTotal(b.photo_ids.length, S, ev), buyer_name: b.name, buyer_phone: b.phone, buyer_email: b.email, receipt: `data:${b.receipt.type};base64,${b.receipt.data}`, status: 'pendiente', created_at: new Date().toISOString() };
+      const o = { id: uid(), token: makeToken(), event_id: b.event_id, events: { title: ev.title }, photo_ids: b.photo_ids, total: calcTotal(b.photo_ids.length, S, ev), buyer_name: b.name, buyer_phone: b.phone, buyer_email: b.email, receipt: `data:${b.receipt.type};base64,${b.receipt.data}`, status: 'pendiente', created_at: new Date().toISOString() };
       O.unshift(o); saveO(); return wait({ token: o.token, total: o.total });
     },
     async order(t) {
@@ -655,6 +736,27 @@ const demo = (() => {
     async updatePhoto(id, patch) { const p = P.find(x => x.id === id); Object.assign(p, patch); return p; },
     async deletePhoto(p) { P.splice(P.indexOf(P.find(x => x.id === p.id)), 1); },
     async saveSettings(s) { Object.assign(S, s); return S; },
+    async createPass(b) {
+      const evs = E.filter(e => b.event_ids.includes(e.id)), t = passTotal(evs, S);
+      const ps = { id: uid(), token: makeToken(), event_ids: b.event_ids, ...t, buyer_name: b.name, buyer_phone: b.phone, buyer_email: b.email, bib: b.bib, selfie_embedding: b.embedding, consent: b.consent, receipt: `data:${b.receipt.type};base64,${b.receipt.data}`, status: 'pendiente', created_at: new Date().toISOString() };
+      PS.unshift(ps); return wait({ token: ps.token, total: t.total });
+    },
+    async pass(t) {
+      const ps = PS.find(x => x.token === t); if (!ps) throw new Error('Pase no encontrado');
+      return wait({ status: ps.status, total: ps.total, base: ps.base, discount: ps.discount, note: ps.note, created_at: ps.created_at, buyer: (ps.buyer_name || '').split(' ')[0],
+        events: E.filter(e => ps.event_ids.includes(e.id)).map(e => ({ id: e.id, title: e.title, date: e.date, location: e.location })).sort((a, b) => (a.date || '').localeCompare(b.date || '')),
+        deliveries: O.filter(o => o.pass_id === ps.id).map(o => ({ event_id: o.event_id, token: o.token, count: o.photo_ids.length })) });
+    },
+    passes: () => wait(PS.slice()),
+    async setPass(id, patch) { Object.assign(PS.find(x => x.id === id), patch); },
+    async passCounts() { const c = {}; PS.filter(x => x.status !== 'rechazado').forEach(x => x.event_ids.forEach(id => c[id] = (c[id] || 0) + 1)); return c; },
+    passHolders: eid => wait(PS.filter(x => x.status === 'aprobado' && x.event_ids.includes(eid))),
+    eventFaces: eid => wait(P.filter(p => p.event_id === eid && p.faces).flatMap(p => p.faces.map(f => ({ photo_id: p.id, embedding: f.descriptor })))),
+    async deliverPass(ps, ev, ids) {
+      const o = { id: uid(), token: makeToken(), event_id: ev.id, events: { title: ev.title }, photo_ids: ids, total: 0, buyer_name: ps.buyer_name, buyer_phone: ps.buyer_phone, status: 'aprobado', approved_at: new Date().toISOString(), pass_id: ps.id, note: 'Pase de fechas', created_at: new Date().toISOString() };
+      O.unshift(o); saveO(); return o.token;
+    },
+    passDeliveries: eid => wait(O.filter(o => o.pass_id && o.event_id === eid).map(o => ({ pass_id: o.pass_id, token: o.token, photo_ids: o.photo_ids }))),
     async addSchedule(x) { const n = { ...x, id: uid() }; SCH.push(n); return n; },
     async delSchedule(id) { SCH.splice(SCH.findIndex(x => x.id === id), 1); }
   };
@@ -732,8 +834,9 @@ function renderNav() {
   const n = cart.ids.length;
   $('#nav').innerHTML = `
     <a href="#/" class="${on('#/')}">${ICON.cam}<span class="lbl">Fotos</span></a>
-    ${SET.about_text ? `<a href="#/quien-soy" class="${on('#/quien-soy')}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17c.8-1.8 2-2.6 3.5-2.6s2.7.8 3.5 2.6M15 10h3M15 14h3"/></svg><span class="lbl">Quién soy</span></a>` : ''}
-    <a href="#/vivo" class="${on('#/vivo')}">${SET.live_active ? ICON.live : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>'}<span class="lbl">En vivo</span></a>
+    ${mod('calendar') ? `<a href="#/calendario" class="${on('#/calendario')}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="lbl">Calendario</span></a>` : ''}
+    ${mod('about') && SET.about_text ? `<a href="#/quien-soy" class="${on('#/quien-soy')}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17c.8-1.8 2-2.6 3.5-2.6s2.7.8 3.5 2.6M15 10h3M15 14h3"/></svg><span class="lbl">Quién soy</span></a>` : ''}
+    ${mod('live') ? `<a href="#/vivo" class="${on('#/vivo')}">${SET.live_active ? ICON.live : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>'}<span class="lbl">En vivo</span></a>` : ''}
     ${n ? `<a href="#/carrito" class="cart-pill">${ICON.cart}<span>${n}</span></a>` : ''}
     <a href="#/admin" class="${on('#/admin')}" title="Panel del fotógrafo">${ICON.user}</a>`;
 }
@@ -759,16 +862,22 @@ let homeFilter = 'todos';
 async function viewHome() {
   const evs = await api.events();
   const app = $('#app');
-  const visible = evs.filter(e => e.published && (homeFilter === 'todos' || e.kind === homeFilter));
+  const today = todayISO();
+  const visible = evs.filter(e => e.published && (!e.date || e.date <= today) && (homeFilter === 'todos' || e.kind === homeFilter));
+  const upcoming = mod('calendar') ? evs.filter(e => e.published && e.date && e.date >= today).sort((a, b) => a.date.localeCompare(b.date)) : [];
   app.innerHTML = `
   <section class="hero"><div class="wrap">
-    ${SET.live_active ? `<a class="live-banner" href="#/vivo"><span class="dot"></span><div><b>EN VIVO AHORA</b><div class="small">${esc(SET.live_title || 'Transmisión en vivo')}</div></div><span class="sp"></span><span class="btn sm accent">Ver</span></a>` : ''}
+    ${mod('live') && SET.live_active ? `<a class="live-banner" href="#/vivo"><span class="dot"></span><div><b>EN VIVO AHORA</b><div class="small">${esc(SET.live_title || 'Transmisión en vivo')}</div></div><span class="sp"></span><span class="btn sm accent">Ver</span></a>` : ''}
     ${SET.logo_url ? `<img class="hero-logo" src="${esc(SET.logo_url)}" alt="">` : ''}
     <h1>${esc(SET.site_name || 'Fotografía')}</h1>
     <p>${esc(SET.tagline || '')}</p>
     <div class="row"><a href="#eventos" class="btn accent" onclick="event.preventDefault();document.getElementById('eventos').scrollIntoView({behavior:'smooth'})">Buscar mis fotos</a>
-    <a href="#/vivo" class="btn ghost" style="color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand-ink) 40%,transparent)">Transmisiones</a></div>
+    ${mod('calendar') ? `<a href="#/calendario" class="btn ghost" style="color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand-ink) 40%,transparent)">${mod('passes') ? 'Próximas fechas y pases' : 'Próximas fechas'}</a>` : mod('live') ? `<a href="#/vivo" class="btn ghost" style="color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand-ink) 40%,transparent)">Transmisiones</a>` : ''}</div>
   </div></section>
+  ${upcoming.length ? `<section class="section" style="padding-bottom:0"><div class="wrap">
+    <div class="row" style="margin-bottom:8px"><h2 style="margin:0;font-size:20px">Próximas fechas</h2><span class="sp"></span><a href="#/calendario" class="small" style="font-weight:650">Ver calendario →</a></div>
+    ${upcoming.slice(0, 3).map(e => { const d = new Date(e.date + 'T12:00:00'); return `<a class="cal-it" href="#/calendario" style="text-decoration:none;color:inherit"><div class="d">${d.getDate()}<small>${d.toLocaleDateString('es-AR', { month: 'short' })}</small></div><div style="min-width:0"><b>${esc(e.title)}</b><div class="small muted">${esc(e.location || '')}</div></div><div class="px small">${mod('passes') && e.pass_enabled !== false ? 'Sacá tu pase →' : ''}</div></a>`; }).join('')}
+  </div></section>` : ''}
   <section class="section" id="eventos"><div class="wrap">
     <div class="chips">
       ${[['todos', 'Todos'], ['competencia', 'Competencias'], ['evento', 'Eventos']].map(([k, l]) => `<button class="chip ${homeFilter === k ? 'on' : ''}" data-f="${k}">${l}</button>`).join('')}
@@ -779,7 +888,7 @@ async function viewHome() {
         <div class="bd"><h3>${esc(e.title)}</h3><div class="muted small">${esc(fmtDate(e.date))}${e.location ? ' · ' + esc(e.location) : ''}</div><div class="small" style="margin-top:4px;font-weight:650">${esc(priceText(SET, e))}</div></div>
       </a>`).join('')}</div>` : `<div class="empty card"><h3>Muy pronto, las primeras fotos</h3><p style="margin:0">Acá vas a encontrar las galerías de cada competencia y evento.${SET.instagram ? ` Mientras tanto, seguime en <a href="https://instagram.com/${esc(SET.instagram.replace('@', ''))}" target="_blank" rel="noopener">@${esc(SET.instagram.replace('@', ''))}</a>.` : ''}</p></div>`}
   </div></section>
-  ${SET.about_text ? `<section class="section" style="padding-top:0"><div class="wrap"><a class="card teaser" href="#/quien-soy" style="text-decoration:none;color:inherit">
+  ${mod('about') && SET.about_text ? `<section class="section" style="padding-top:0"><div class="wrap"><a class="card teaser" href="#/quien-soy" style="text-decoration:none;color:inherit">
     ${SET.about_photo_url ? `<img src="${esc(SET.about_photo_url)}" alt="">` : `<div class="ph">${esc((SET.site_name || 'F')[0])}</div>`}
     <div style="min-width:0"><b style="font-size:17px">${esc(SET.about_title || 'Quién soy')}</b><p>${esc(SET.about_text.split(/\n+/)[0].slice(0, 160))}${SET.about_text.split(/\n+/)[0].length > 160 ? '…' : ''}</p><span style="color:var(--brand2);font-weight:650">Conocé más →</span></div>
   </a></div></section>` : ''}`;
@@ -802,7 +911,7 @@ async function viewEvent(id) {
       <div class="small" style="margin-top:6px"><b>${esc(priceText(SET, ev))}</b></div>
     </div>
     <div class="tools">
-      <button class="btn face" id="selfieBtn">🤳 Buscame con una selfie</button>
+      ${mod('selfie') ? '<button class="btn face" id="selfieBtn">🤳 Buscame con una selfie</button>' : ''}
       ${hasBibs ? `<div class="search">${ICON.search}<input type="text" inputmode="numeric" id="qBib" placeholder="Buscar por número de dorsal" value="${esc(galState.q)}"></div>` : ''}
       ${tags.length ? `<select id="qTag" style="flex:0 1 200px"><option value="">Todos los momentos</option>${tags.map(t => `<option ${galState.tag === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>` : ''}
     </div>
@@ -844,7 +953,7 @@ async function viewEvent(id) {
   };
   const qb = $('#qBib'); if (qb) qb.oninput = () => { galState.q = qb.value; draw(); };
   const qt = $('#qTag'); if (qt) qt.onchange = () => { galState.tag = qt.value; draw(); };
-  $('#selfieBtn').onclick = () => openSelfie(ev, ids => { galState.faceIds = ids; draw(); window.scrollTo({ top: $('#faceBar').offsetTop - 70, behavior: 'smooth' }); });
+  if ($('#selfieBtn')) $('#selfieBtn').onclick = () => openSelfie(ev, ids => { galState.faceIds = ids; draw(); window.scrollTo({ top: $('#faceBar').offsetTop - 70, behavior: 'smooth' }); });
   draw(); updateCartUI();
 }
 
@@ -995,7 +1104,7 @@ async function viewOrder(token, isNew) {
   <div class="wrap" style="padding-top:22px;padding-bottom:30px">
     <div class="card" style="max-width:760px;margin:0 auto">
       <div class="row"><h2 style="margin:0">Pedido ${o.buyer ? 'de ' + esc(o.buyer) : ''}</h2><span class="sp"></span><span class="badge b-${o.status}">${o.status}</span></div>
-      <div class="muted small" style="margin-top:4px">${esc(o.event || '')} · ${o.count} fotos · ${money(o.total)} · ${fmtDT(o.created_at)}</div>
+      <div class="muted small" style="margin-top:4px">${esc(o.event || '')} · ${pl(o.count, 'foto', 'fotos')} · ${+o.total ? money(o.total) : (o.count === 1 ? 'incluida' : 'incluidas') + ' en tu pase'} · ${fmtDT(o.created_at)}</div>
       <p style="margin:14px 0">${esc(msgs[o.status])}</p>
       ${isNew || o.status === 'pendiente' ? `
         <div class="pay"><div class="k">Guardá este link para volver a tu pedido</div>
@@ -1070,7 +1179,7 @@ const BOT = {
   faqs() {
     return String(SET.faq || FAQ_DEFAULT).split(/\n\s*\n/).map(b => b.trim()).filter(Boolean).map(b => {
       const [q, ...a] = b.split('\n'); return { q: q.trim(), a: a.join('\n').trim(), qt: new Set(this.tokens(q)), at: new Set(this.tokens(a.join(' '))) };
-    }).filter(f => f.q && f.a);
+    }).filter(f => f.q && f.a && (mod('passes') || !f.a.includes('{pase}')) && (mod('live') || !f.a.includes('{proxima}')));
   },
   fill(a) {
     const line = ev => { const x = evPrices(ev); return `${money(x.p)} por foto` + (x.hasPack ? ` · pack de ${x.k} por ${money(x.P)} (${money(x.P / x.k)} c/u)` : ''); };
@@ -1083,6 +1192,7 @@ const BOT = {
     return a.replace(/\{precios\}/g, precios)
       .replace(/\{alias\}/g, SET.alias ? `el alias ${SET.alias}` : 'la cuenta que figura al confirmar el pedido')
       .replace(/\{instagram\}/g, ig ? '@' + ig : '')
+      .replace(/\{pase\}/g, `${SET.pass_intro || PASS_DEFAULT.intro} Descuentos: ${tiersText().join(', ') || 'consultá en el calendario'}. Incluye ${passIncludes()}. Lo sacás desde la sección Calendario.`)
       .replace(/\{proxima\}/g, this._next ? `La próxima: ${this._next.title}, el ${fmtDT(this._next.starts_at)} hs.` : '');
   },
   answer(text) {
@@ -1116,7 +1226,7 @@ const BOT = {
   },
   async render() {
     const root = $('#bot'); if (!root) return;
-    const hidden = (location.hash || '').startsWith('#/admin');
+    const hidden = (location.hash || '').startsWith('#/admin') || !mod('chat');
     if (hidden) { root.innerHTML = ''; return; }
     if (!this.open) {
       root.innerHTML = `<button class="fab" aria-label="Abrir ayuda"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 16.5h.01"/></svg></button>`;
@@ -1146,6 +1256,142 @@ const BOT = {
     root.querySelectorAll('.msgs a[href^="#/"]').forEach(a => a.addEventListener('click', () => { this.open = false; }));
   }
 };
+
+/* =====================================================================
+   CALENDARIO Y PASE DE FECHAS
+   ===================================================================== */
+let passSel = store.get('pass_sel', []);
+const savePassSel = () => store.set('pass_sel', passSel);
+async function upcomingEvents() {
+  const t = todayISO();
+  return (await api.events()).filter(e => e.published && e.date && e.date >= t).sort((a, b) => a.date.localeCompare(b.date));
+}
+async function viewCalendar() {
+  const [evs, sch, counts] = await Promise.all([upcomingEvents(), mod('live') ? api.schedule().catch(() => []) : [], mod('passes') ? api.passCounts() : {}]);
+  passSel = passSel.filter(id => evs.some(e => e.id === id)); savePassSel();
+  const liveDays = new Set(sch.map(x => new Date(x.starts_at).toLocaleDateString('sv-SE')));
+  const passes = mod('passes'), tiers = tiersText();
+  const left = e => +e.pass_quota > 0 ? Math.max(0, +e.pass_quota - (counts[e.id] || 0)) : null;
+  const draw = () => {
+    let month = '';
+    $('#app').innerHTML = `<div class="wrap" style="padding-block:22px 110px">
+      <h1>Calendario</h1>
+      ${passes ? `<div class="card" style="margin-bottom:10px"><b style="font-size:16px">Pase de fechas</b>
+        <p style="margin:6px 0">${esc(SET.pass_intro || PASS_DEFAULT.intro)}</p>
+        ${tiers.length ? `<div class="tiers">${tiers.map(t => `<span>${esc(t)}</span>`).join('')}</div>` : ''}
+        <div class="small muted">Incluye ${esc(passIncludes())}. Marcá las fechas a las que vas.</div></div>` : '<p class="muted">Las próximas fechas donde voy a estar sacando fotos.</p>'}
+      ${evs.length ? evs.map(e => {
+        const d = new Date(e.date + 'T12:00:00'), m = d.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+        const head = m !== month ? `<div class="cal-month">${esc(m)}</div>` : ''; month = m;
+        const l = left(e), canPass = passes && e.pass_enabled !== false, full = canPass && l === 0, on = passSel.includes(e.id);
+        const tag = canPass ? 'label' : 'div';
+        return head + `<${tag} class="cal-it ${on ? 'on' : ''} ${full ? 'full' : ''}">
+          <div class="d">${d.getDate()}<small>${d.toLocaleDateString('es-AR', { weekday: 'short' })}</small></div>
+          <div style="min-width:0"><b>${esc(e.title)}</b><div class="small muted">${esc(e.location || '')}${e.location ? ' · ' : ''}${e.kind === 'evento' ? 'Evento' : 'Competencia'}</div>
+            <div>${liveDays.has(e.date) ? '<span class="badge2">📡 Con transmisión</span>' : ''}${canPass && l != null ? `<span class="badge2">${l ? (l === 1 ? 'Queda 1 lugar' : `Quedan ${l} lugares`) : 'Sin lugares'}</span>` : ''}</div></div>
+          <div class="px">${canPass ? `${money(passPrice(e))}<br><input type="checkbox" data-id="${e.id}" ${on ? 'checked' : ''} ${full && !on ? 'disabled' : ''} aria-label="Elegir ${esc(e.title)}">` : ''}</div>
+        </${tag}>`;
+      }).join('') : `<div class="empty card"><h3>Todavía no hay fechas cargadas</h3><p style="margin:0">Pronto vas a ver acá el calendario de la temporada.</p></div>`}
+    </div>
+    ${passes && passSel.length ? (() => { const sel = evs.filter(e => passSel.includes(e.id)), t = passTotal(sel); return `<div class="passbar"><div class="wrap"><div><b>${sel.length} ${sel.length === 1 ? 'fecha' : 'fechas'} · ${money(t.total)}</b><div class="small" style="opacity:.8">${t.discount ? `Ahorrás ${money(t.base - t.total)} (−${t.discount}%)` : tiers.length ? 'Sumá fechas para tener descuento' : ''}</div></div><div class="sp"></div><a href="#/pase" class="btn accent">Sacar mi pase →</a></div></div>`; })() : ''}`;
+    document.body.classList.toggle('has-bar', passes && passSel.length > 0);
+    $$('.cal-it input[type=checkbox]').forEach(c => c.onchange = () => {
+      const id = c.dataset.id; passSel = c.checked ? [...new Set([...passSel, id])] : passSel.filter(x => x !== id); savePassSel(); const y = scrollY; draw(); scrollTo(0, y);
+    });
+  };
+  draw();
+}
+
+async function viewPassCheckout() {
+  const evs = (await upcomingEvents()).filter(e => passSel.includes(e.id) && e.pass_enabled !== false);
+  const app = $('#app');
+  if (!evs.length) { app.innerHTML = `<div class="wrap empty"><h2>No elegiste fechas</h2><p>Marcá en el calendario las fechas a las que vas.</p><a class="btn" href="#/calendario">Ir al calendario</a></div>`; return; }
+  const t = passTotal(evs);
+  let embedding = null;
+  app.innerHTML = `<div class="wrap" style="padding-block:20px 30px">
+    <a href="#/calendario" class="small">← Cambiar fechas</a>
+    <h1 style="margin-top:10px">Tu pase</h1>
+    <div class="layout2">
+      <div class="card">
+        ${evs.map(e => `<div class="sum"><span>${esc(fmtDate(e.date))} · ${esc(e.title)}</span><span>${money(passPrice(e))}</span></div>`).join('')}
+        ${t.discount ? `<div class="sum" style="color:var(--ok)"><span>Descuento por ${evs.length} fechas (−${t.discount}%)</span><span>−${money(t.base - t.total)}</span></div>` : ''}
+        <div class="sum tot"><span>Total</span><span>${money(t.total)}</span></div>
+        <p class="small" style="margin:10px 0 4px"><b>Incluye:</b> ${esc(passIncludes())}.</p>
+        <p class="small muted" style="margin:0">${esc(SET.pass_policy || PASS_DEFAULT.policy)}</p>
+      </div>
+      <form class="card" id="pchk" novalidate>
+        <h3>1. Transferí ${money(t.total)}</h3>
+        <div class="pay">
+          ${SET.alias ? `<div class="row"><div><div class="k">Alias</div><div class="v">${esc(SET.alias)}</div></div><button type="button" class="btn sm ghost copy" data-c="${esc(SET.alias)}">Copiar</button></div>` : ''}
+          ${SET.cbu ? `<div class="row" style="margin-top:10px"><div style="min-width:0"><div class="k">CBU / CVU</div><div class="v" style="font-size:15px">${esc(SET.cbu)}</div></div><button type="button" class="btn sm ghost copy" data-c="${esc(SET.cbu)}">Copiar</button></div>` : ''}
+          ${SET.titular ? `<div style="margin-top:10px"><div class="k">Titular</div><div>${esc(SET.titular)}</div></div>` : ''}
+          <div class="row" style="margin-top:10px"><div><div class="k">Monto exacto</div><div class="v">${money(t.total)}</div></div><button type="button" class="btn sm ghost copy" data-c="${t.total}">Copiar</button></div>
+        </div>
+        <h3>2. Tus datos</h3>
+        <label class="f"><span>Nombre y apellido *</span><input type="text" name="name" autocomplete="name"></label>
+        <label class="f"><span>WhatsApp *</span><input type="tel" name="phone" autocomplete="tel" placeholder="341 555 1234"></label>
+        <label class="f"><span>Email (opcional)</span><input type="email" name="email" autocomplete="email"></label>
+        <label class="f"><span>Tu número de dorsal (si ya lo sabés)</span><input type="text" name="bib" inputmode="numeric" placeholder="Ej: 117"></label>
+        ${mod('selfie') ? `<div class="pay small" style="background:var(--bg);border-color:var(--line)">
+          <b>Selfie para encontrarte (opcional)</b><br>Así te encuentro aunque cambie tu dorsal. Se guarda solo una huella numérica de tu cara, no la foto, y se usa únicamente para tus fotos de este pase.
+          <label class="switch small" style="font-weight:500;margin:8px 0;align-items:flex-start"><input type="checkbox" id="pOk" style="margin-top:2px"> <span>Acepto que se guarde mi huella facial para encontrarme en las fechas de mi pase.</span></label>
+          <label class="btn sm ghost" id="pSelfie" style="cursor:pointer">🤳 Agregar selfie<input type="file" accept="image/*" capture="user" hidden></label> <span id="pSelfieMsg"></span>
+        </div>` : ''}
+        <h3 style="margin-top:12px">3. Comprobante</h3>
+        <label class="drop" id="pdrop"><input type="file" name="rc" accept="image/*,application/pdf" hidden><span id="pdropT">📎 Adjuntá el comprobante de la transferencia</span></label>
+        <div id="perr" class="small" style="color:var(--bad);margin-top:10px"></div>
+        <button class="btn accent block" style="margin-top:14px" id="psend">Confirmar pase</button>
+      </form>
+    </div></div>`;
+  $$('.copy', app).forEach(b => b.onclick = () => copy(b.dataset.c));
+  const fi = $('input[name=rc]', app);
+  fi.onchange = () => { const f = fi.files[0]; $('#pdrop').classList.toggle('has', !!f); $('#pdropT').textContent = f ? '✓ ' + f.name : '📎 Adjuntá el comprobante'; };
+  const ps = $('#pSelfie');
+  if (ps) {
+    ps.addEventListener('click', e => { if (!$('#pOk').checked) { e.preventDefault(); $('#pSelfieMsg').textContent = 'Primero aceptá el uso de la huella facial.'; } });
+    $('input', ps).onchange = async ev => {
+      const f = ev.target.files[0]; if (!f) return; const m = $('#pSelfieMsg'); m.textContent = 'Analizando…';
+      try { const src = await decodeFile(f); embedding = await FACE.selfie(src); if (src.close) src.close(); m.textContent = embedding ? '✓ Listo, te vamos a reconocer' : 'No encontramos una cara. Probá de frente y con luz.'; }
+      catch (e2) { m.textContent = e2.message; }
+    };
+  }
+  $('#pchk').onsubmit = async e => {
+    e.preventDefault(); const f = e.target, err = $('#perr'); err.textContent = '';
+    const name = f.name.value.trim(), phone = digits(f.phone.value), file = fi.files[0];
+    if (name.length < 2) return err.textContent = 'Completá tu nombre.';
+    if (phone.length < 8) return err.textContent = 'Completá un WhatsApp válido.';
+    if (!file) return err.textContent = 'Adjuntá el comprobante de la transferencia.';
+    const btn = $('#psend'); btn.disabled = true; btn.textContent = 'Enviando…';
+    try {
+      let blob = file, type = file.type;
+      if (type.startsWith('image/')) { blob = await resizeImage(file, 1600, 'image/jpeg', .8); type = 'image/jpeg'; }
+      else if (type !== 'application/pdf') throw new Error('Formato no soportado. Subí una imagen o PDF.');
+      if (blob.size > 4.4 * 1024 * 1024) throw new Error('El archivo pesa demasiado (máx. 4 MB).');
+      const consent = !!($('#pOk') && $('#pOk').checked && embedding);
+      const res = await api.createPass({ event_ids: evs.map(x => x.id), name, phone: phone.length === 10 ? '549' + phone : phone, email: f.email.value.trim(), bib: digits(f.bib.value), embedding: consent ? embedding : null, consent, receipt: { data: await blobToB64(blob), type } });
+      const mine = store.get('my_passes', []); mine.unshift({ token: res.token, n: evs.length, total: res.total, at: Date.now() }); store.set('my_passes', mine.slice(0, 10));
+      passSel = []; savePassSel();
+      location.hash = '#/mi-pase/' + res.token + '?nuevo=1';
+    } catch (ex) { err.textContent = ex.message; btn.disabled = false; btn.textContent = 'Confirmar pase'; }
+  };
+}
+
+async function viewMyPass(token, isNew) {
+  const app = $('#app'); let ps;
+  try { ps = await api.pass(token); } catch (e) { app.innerHTML = `<div class="wrap empty"><h2>No encontramos el pase</h2><p>${esc(e.message)}</p></div>`; return; }
+  const link = baseUrl() + '#/mi-pase/' + token, dmap = new Map((ps.deliveries || []).map(d => [d.event_id, d]));
+  const msg = { pendiente: 'Recibimos tu pase. Cuando verifique la transferencia queda confirmado.', aprobado: '¡Tu pase está confirmado! Después de cada fecha vas a ver acá el link a tus fotos.', rechazado: 'No pudimos verificar el pago. ' + (ps.note ? 'Motivo: ' + ps.note : 'Escribime para resolverlo.') };
+  app.innerHTML = `<div class="wrap" style="padding-block:22px 30px"><div class="card" style="max-width:760px;margin:0 auto">
+    <div class="row"><h2 style="margin:0">Pase ${ps.buyer ? 'de ' + esc(ps.buyer) : ''}</h2><span class="sp"></span><span class="badge b-${ps.status}">${ps.status}</span></div>
+    <div class="muted small" style="margin-top:4px">${ps.events.length} fechas · ${money(ps.total)}${+ps.discount ? ` (−${ps.discount}%)` : ''} · ${fmtDT(ps.created_at)}</div>
+    <p style="margin:14px 0">${esc(msg[ps.status])}</p>
+    ${ps.events.map(e => { const d = dmap.get(e.id); return `<div class="sum"><span>${esc(fmtDate(e.date))} · ${esc(e.title)}</span><span>${d ? `<a href="#/pedido/${esc(d.token)}" style="font-weight:700">Ver ${d.count === 1 ? 'mi foto' : 'mis ' + (d.count || '') + ' fotos'} →</a>` : '<span class="muted small">' + (ps.status === 'aprobado' ? 'Fotos pendientes' : '—') + '</span>'}</span></div>`; }).join('')}
+    ${isNew || ps.status === 'pendiente' ? `<div class="pay" style="margin-top:14px"><div class="k">Guardá este link: acá vas a recibir tus fotos</div>
+      <div class="row" style="margin-top:6px"><div class="small" style="word-break:break-all;flex:1">${esc(link)}</div><button class="btn sm ghost copy" data-c="${esc(link)}">Copiar</button></div></div>
+      ${SET.whatsapp ? `<a class="btn ok block" target="_blank" rel="noopener" href="${waLink(SET.whatsapp, `Hola! Saqué un pase de ${ps.events.length} fechas por ${money(ps.total)} y adjunté el comprobante. Mi pase: ${link}`)}">Avisar al fotógrafo por WhatsApp</a>` : ''}` : ''}
+  </div></div>`;
+  $$('.copy', app).forEach(b => b.onclick = () => copy(b.dataset.c));
+}
 
 function ytEmbed(u) {
   if (!u) return null; let m;
@@ -1179,7 +1425,7 @@ async function viewLive() {
 /* =====================================================================
    PANEL DEL FOTÓGRAFO
    ===================================================================== */
-let adminTab = 'pedidos', orderFilter = 'pendiente';
+let adminTab = 'pedidos', orderFilter = 'pendiente', adminSeq = 0, adminDone = 0;
 async function viewAdmin(sub) {
   const app = $('#app');
   if (!api.authed()) {
@@ -1200,16 +1446,21 @@ async function viewAdmin(sub) {
   if (sub && sub.startsWith('evento/')) return adminEvent(sub.split('/')[1]);
   app.innerHTML = `<div class="wrap" style="padding-top:16px;padding-bottom:40px">
     <div class="row"><h1 style="margin:0">Panel</h1><span class="sp"></span><button class="btn sm ghost" id="out">Salir</button></div>
-    <div class="tabs">${[['pedidos', 'Pedidos'], ['eventos', 'Eventos y fotos'], ['vivo', 'En vivo'], ['ajustes', 'Ajustes']].map(([k, l]) => `<button data-t="${k}" class="${adminTab === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+    <div class="tabs">${[['pedidos', 'Pedidos'], ['eventos', 'Eventos y fotos'], ...(mod('passes') ? [['pases', 'Pases']] : []), ...(mod('live') ? [['vivo', 'En vivo']] : []), ['ajustes', 'Ajustes']].map(([k, l]) => `<button data-t="${k}" class="${adminTab === k ? 'on' : ''}">${l}</button>`).join('')}</div>
     <div id="pane"><div class="spin"></div></div></div>`;
   $('#out').onclick = () => { api.logout(); viewAdmin(); };
   $$('.tabs button', app).forEach(b => b.onclick = () => { adminTab = b.dataset.t; viewAdmin(); });
-  try { await ({ pedidos: adminOrders, eventos: adminEvents, vivo: adminLive, ajustes: adminSettings })[adminTab]($('#pane')); }
-  catch (e) { $('#pane').innerHTML = `<div class="card" style="color:var(--bad)">${esc(e.message)}</div>`; if (/JWT|token/i.test(e.message)) { api.logout(); } }
+  if ((adminTab === 'pases' && !mod('passes')) || (adminTab === 'vivo' && !mod('live'))) adminTab = 'pedidos';
+  const seq = ++adminSeq, pane = $('#pane');
+  try { await ({ pedidos: adminOrders, eventos: adminEvents, pases: adminPasses, vivo: adminLive, ajustes: adminSettings })[adminTab](pane); }
+  catch (e) { if (seq === adminSeq && pane.isConnected) pane.innerHTML = `<div class="card" style="color:var(--bad)">${esc(e.message)}</div>`; if (/JWT|token/i.test(e.message)) { api.logout(); } }
+  if (seq < adminDone && location.hash.startsWith('#/admin')) return viewAdmin(sub);
+  adminDone = Math.max(adminDone, seq);
 }
 
 async function adminOrders(pane) {
   const all = await api.orders();
+  if (!pane.isConnected) return;
   const list = all.filter(o => orderFilter === 'todos' || o.status === orderFilter);
   const cnt = s => all.filter(o => o.status === s).length;
   const ids = [...new Set(list.slice(0, 60).flatMap(o => o.photo_ids))];
@@ -1291,6 +1542,11 @@ function eventForm(e = {}) {
       <label class="f"><span>Precio del pack</span><input type="number" name="pack_price" min="0" step="1" value="${e.id ? (e.pack_price ?? '') : (SET.pack_price ?? '')}"></label>
     </div>
     <p class="small muted" style="margin:-4px 0 12px" id="evPx"></p>
+    ${mod('passes') ? `<div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <label class="f"><span>Precio de esta fecha en el pase</span><input type="number" name="pass_price" min="0" step="1" value="${e.id ? (e.pass_price ?? '') : ''}" placeholder="${esc(SET.pass_price_default ?? '')}"></label>
+      <label class="f"><span>Cupo de abonados (vacío = sin límite)</span><input type="number" name="pass_quota" min="0" step="1" value="${e.pass_quota ?? ''}"></label>
+    </div>
+    <label class="switch small"><input type="checkbox" name="pass_enabled" ${e.pass_enabled !== false ? 'checked' : ''}> Se puede incluir en el pase de fechas</label>` : ''}
     <label class="switch"><input type="checkbox" name="published" ${e.published ? 'checked' : ''}> Publicado (visible para el público)</label>
     <div class="row"><button class="btn">Guardar</button>${e.id ? '<button type="button" class="btn bad sm" id="evdel">Eliminar evento</button>' : ''}</div>
   </form>`;
@@ -1301,15 +1557,17 @@ function wireEventPrices(f) {
   ['price_photo', 'pack_size', 'pack_price'].forEach(k => f[k].addEventListener('input', upd)); upd();
 }
 function readEventForm(f, base = {}) {
-  return { ...base, title: f.title.value.trim(), kind: f.kind.value, date: f.date.value || null, location: f.location.value.trim() || null, price_photo: f.price_photo.value === '' ? null : +f.price_photo.value, pack_size: f.pack_size.value === '' ? null : +f.pack_size.value, pack_price: f.pack_price.value === '' ? null : +f.pack_price.value, published: f.published.checked };
+  return { ...base, title: f.title.value.trim(), kind: f.kind.value, date: f.date.value || null, location: f.location.value.trim() || null, price_photo: f.price_photo.value === '' ? null : +f.price_photo.value, pack_size: f.pack_size.value === '' ? null : +f.pack_size.value, pack_price: f.pack_price.value === '' ? null : +f.pack_price.value, published: f.published.checked,
+    ...(f.pass_price ? { pass_price: f.pass_price.value === '' ? null : +f.pass_price.value, pass_quota: f.pass_quota.value === '' ? null : +f.pass_quota.value, pass_enabled: f.pass_enabled.checked } : {}) };
 }
 async function adminEvents(pane) {
   const evs = await api.events();
+  if (!pane.isConnected) return;
   pane.innerHTML = `<details ${evs.length ? '' : 'open'}><summary class="btn accent" style="margin-bottom:12px;list-style:none">+ Nuevo evento</summary>${eventForm()}</details>
     <div class="card">${evs.length ? evs.map(e => `
       <div class="order" style="grid-template-columns:auto 1fr auto;align-items:center">
         <div style="width:72px;height:48px;border-radius:6px;background:#dde3e9 center/cover url('${api.cover(e)}')"></div>
-        <div><b>${esc(e.title)}</b><div class="small muted">${esc(fmtDate(e.date))} · ${e.kind} · ${e.published ? '<span style="color:var(--ok)">Publicado</span>' : 'Borrador'}</div></div>
+        <div><b>${esc(e.title)}</b><div class="small muted">${esc(fmtDate(e.date))} · ${e.kind} · ${e.published ? '<span style="color:var(--ok)">Publicado</span>' : 'Borrador'}${e.date && e.date >= todayISO() ? ' · Próxima' : ''}</div></div>
         <a class="btn sm" href="#/admin/evento/${e.id}">Gestionar</a>
       </div>`).join('') : '<div class="empty">Creá tu primer evento.</div>'}</div>`;
   wireEventPrices($('#evf'));
@@ -1339,6 +1597,7 @@ async function adminEvent(id) {
       <label class="btn accent" style="cursor:pointer">📤 Elegir fotos<input type="file" id="upF" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
       <div id="upS" class="hidden"><div class="progress"><i id="upP"></i></div><div class="small muted" id="upT"></div></div>
     </div>
+    <div id="abon"></div>
     <div class="card">
       <div class="row" style="margin-bottom:10px"><h3 style="margin:0">${photos.length} fotos</h3><span class="sp"></span>
         ${photos.some(p => !p.faces_indexed) ? `<button class="btn sm" id="idx">🤳 Detectar caras (${photos.filter(p => !p.faces_indexed).length} pendientes)</button>` : ''}
@@ -1397,6 +1656,7 @@ async function adminEvent(id) {
     toast(`Listo: ${done - fail} fotos subidas${fail ? `, ${fail} fallaron` : ''}`, 3500);
     adminEvent(id);
   };
+  if (mod('passes')) renderHolders(ev, photos).catch(e => { $('#abon').innerHTML = `<div class="card" style="color:var(--bad);margin-bottom:14px">${esc(e.message)}</div>`; });
   const idx = $('#idx'); if (idx) idx.onclick = async () => {
     const pend = photos.filter(p => !p.faces_indexed), tiles = $('#upTiles').checked;
     idx.disabled = true; $('#idxS').classList.remove('hidden');
@@ -1412,8 +1672,136 @@ async function adminEvent(id) {
   };
 }
 
+let passFilter = 'pendiente';
+async function adminPasses(pane) {
+  const [all, evs] = await Promise.all([api.passes(), api.events()]);
+  if (!pane.isConnected) return;
+  const evMap = Object.fromEntries(evs.map(e => [e.id, e]));
+  const list = all.filter(p => passFilter === 'todos' || p.status === passFilter);
+  const cnt = st => all.filter(p => p.status === st).length;
+  const sold = all.filter(p => p.status === 'aprobado').reduce((a, p) => a + +p.total, 0);
+  const s = SET;
+  pane.innerHTML = `
+    <form class="card" id="pcf" style="margin-bottom:12px">
+      <h3>Configuración del pase</h3>
+      <label class="f"><span>Descuentos por cantidad de fechas (formato fechas:%, separados por coma)</span><input type="text" name="pass_tiers" value="${esc(s.pass_tiers ?? PASS_DEFAULT.tiers)}" placeholder="2:10, 3:15, 4:20"></label>
+      <div class="grid2">
+        <label class="f"><span>Precio por fecha por defecto</span><input type="number" min="0" step="1" name="pass_price_default" value="${esc(s.pass_price_default ?? '')}"></label>
+        <label class="f"><span>Fotos incluidas por fecha (0 = todas)</span><input type="number" min="0" step="1" name="pass_max_photos" value="${esc(s.pass_max_photos ?? 0)}"></label>
+      </div>
+      <label class="f"><span>Texto de presentación del pase</span><textarea name="pass_intro" rows="3">${esc(s.pass_intro ?? PASS_DEFAULT.intro)}</textarea></label>
+      <label class="f"><span>Regla si el abonado no sale en las fotos</span><textarea name="pass_policy" rows="2">${esc(s.pass_policy ?? PASS_DEFAULT.policy)}</textarea></label>
+      <p class="small muted" id="pcEx" style="margin-top:-4px"></p>
+      <button class="btn">Guardar</button>
+    </form>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card"><div class="small muted">Pases vendidos (aprobados)</div><div style="font-size:24px;font-weight:800">${money(sold)}</div></div>
+      <div class="card"><div class="small muted">Abonados activos</div><div style="font-size:24px;font-weight:800">${cnt('aprobado')}</div></div>
+    </div>
+    <div class="chips">${[['pendiente', 'Pendientes'], ['aprobado', 'Aprobados'], ['rechazado', 'Rechazados'], ['todos', 'Todos']].map(([k, l]) => `<button class="chip ${passFilter === k ? 'on' : ''}" data-f="${k}">${l}${k !== 'todos' ? ' (' + cnt(k) + ')' : ''}</button>`).join('')}</div>
+    <div class="card">${list.length ? list.map(p => `
+      <div class="order">
+        <div style="min-width:0">
+          <div class="row"><b>${esc(p.buyer_name)}</b><span class="badge b-${p.status}">${p.status}</span></div>
+          <div class="small muted">${fmtDT(p.created_at)}${p.bib ? ' · Dorsal ' + esc(p.bib) : ''}${p.selfie_embedding ? ' · 🤳 con selfie' : ''}${p.buyer_phone ? ` · <a href="${waLink(p.buyer_phone, 'Hola ' + (p.buyer_name || '').split(' ')[0] + '!')}" target="_blank" rel="noopener">WhatsApp</a>` : ''}</div>
+          <div style="margin-top:4px"><b style="font-size:18px">${money(p.total)}</b> · ${p.event_ids.length} fechas${+p.discount ? ` (−${p.discount}%)` : ''}</div>
+          <div class="small" style="margin-top:4px">${p.event_ids.map(id => evMap[id] ? esc(fmtDate(evMap[id].date) + ' · ' + evMap[id].title) : 'Fecha eliminada').join('<br>')}</div>
+          ${p.note ? `<div class="small" style="margin-top:4px">Nota: ${esc(p.note)}</div>` : ''}
+        </div>
+        <div class="acts">
+          ${(p.receipt_path || p.receipt) ? `<button class="btn sm ghost" data-rc="${p.id}">Ver comprobante</button>` : ''}
+          ${p.status !== 'aprobado' ? `<button class="btn sm ok" data-ap="${p.id}">Aprobar</button>` : ''}
+          ${p.status === 'pendiente' ? `<button class="btn sm bad" data-rj="${p.id}">Rechazar</button>` : ''}
+        </div>
+      </div>`).join('') : '<div class="empty">No hay pases en esta lista.</div>'}</div>`;
+  const f = $('#pcf');
+  const ex = () => { const tmp = { pass_tiers: f.pass_tiers.value, pass_price_default: f.pass_price_default.value }; const fake = n => Array.from({ length: n }, () => ({})); $('#pcEx').textContent = 'Ejemplo: ' + [1, 2, 3, 4].map(n => `${n} ${n === 1 ? 'fecha' : 'fechas'} = ${money(passTotal(fake(n), tmp).total)}`).join(' · '); };
+  ['pass_tiers', 'pass_price_default'].forEach(k => f[k].addEventListener('input', ex)); ex();
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const o = { pass_tiers: f.pass_tiers.value.trim() || null, pass_price_default: f.pass_price_default.value === '' ? null : +f.pass_price_default.value, pass_max_photos: +f.pass_max_photos.value || 0, pass_intro: f.pass_intro.value.trim() || null, pass_policy: f.pass_policy.value.trim() || null };
+    SET = { ...SET, ...(await api.saveSettings(o) || o) }; toast('Configuración del pase guardada');
+  };
+  $$('.chip', pane).forEach(b => b.onclick = () => { passFilter = b.dataset.f; adminPasses(pane); });
+  const byId = id => all.find(p => p.id === id);
+  $$('[data-rc]', pane).forEach(b => b.onclick = async () => {
+    const p = byId(b.dataset.rc);
+    try {
+      const url = await api.receiptUrl(p.receipt_path || p.receipt), isPdf = /\.pdf(\?|$)|^data:application\/pdf/i.test(url);
+      const m = document.createElement('div'); m.className = 'modal';
+      m.innerHTML = `<div class="sheet"><div class="row" style="margin-bottom:10px"><h3 style="margin:0">Comprobante de ${esc(p.buyer_name)}</h3><span class="sp"></span><button class="iconbtn" style="background:var(--bg);color:var(--ink)" aria-label="Cerrar">✕</button></div>
+        <div class="small muted" style="margin-bottom:10px">Total del pase: <b>${money(p.total)}</b>. Verificá el ingreso en tu home banking.</div>
+        ${isPdf ? `<a class="btn block" href="${esc(url)}" target="_blank" rel="noopener">Abrir PDF</a>` : `<img src="${esc(url)}" alt="Comprobante" style="width:100%;border-radius:10px;border:1px solid var(--line)">`}</div>`;
+      document.body.appendChild(m); m.onclick = e => { if (e.target === m || e.target.closest('.iconbtn')) m.remove(); };
+    } catch (e) { toast(e.message); }
+  });
+  $$('[data-ap]', pane).forEach(b => b.onclick = async () => {
+    const p = byId(b.dataset.ap);
+    if (!confirm(`¿Confirmás que recibiste ${money(p.total)} de ${p.buyer_name}?`)) return;
+    await api.setPass(p.id, { status: 'aprobado', approved_at: new Date().toISOString(), note: null });
+    if (p.buyer_phone) window.open(waLink(p.buyer_phone, `Hola ${(p.buyer_name || '').split(' ')[0]}! Tu pase de ${p.event_ids.length} fechas está confirmado ✅ Después de cada fecha te mando tus fotos. Tu pase: ${baseUrl()}#/mi-pase/${p.token}`), '_blank');
+    toast('Pase aprobado'); adminPasses(pane);
+  });
+  $$('[data-rj]', pane).forEach(b => b.onclick = async () => {
+    const p = byId(b.dataset.rj), note = prompt('Motivo del rechazo (lo ve el cliente):', 'No encontramos la transferencia'); if (note === null) return;
+    await api.setPass(p.id, { status: 'rechazado', note }); adminPasses(pane);
+  });
+}
+
+/* Abonados de una fecha: sus fotos se encuentran por dorsal y por selfie */
+async function renderHolders(ev, photos) {
+  const box = $('#abon'); if (!box) return;
+  const holders = await api.passHolders(ev.id);
+  if (!holders.length) { box.innerHTML = `<div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:4px">Abonados en esta fecha</h3><p class="small muted" style="margin:0">Todavía no hay pases aprobados que incluyan esta fecha.</p></div>`; return; }
+  const deliv = await api.passDeliveries(ev.id), dmap = new Map(deliv.map(d => [d.pass_id, d]));
+  const faces = holders.some(h => h.selfie_embedding) ? await api.eventFaces(ev.id) : [];
+  const max = +SET.pass_max_photos || 0;
+  const match = h => {
+    const m = new Map(), bib = digits(h.bib), emb = parseVec(h.selfie_embedding);
+    if (bib) photos.forEach(p => { if ((p.bibs || []).some(b => digits(b) === bib)) m.set(p.id, 0); });
+    if (emb) for (const f of faces) { const d = FACE.dist(f.embedding, emb); if (d < FACE.THRESHOLD && (!m.has(f.photo_id) || m.get(f.photo_id) > d)) m.set(f.photo_id, d); }
+    return [...m.entries()].sort((a, b) => a[1] - b[1]).map(x => x[0]).filter(id => photos.some(p => p.id === id));
+  };
+  const rows = holders.map(h => ({ h, ids: match(h), d: dmap.get(h.id) }));
+  box.innerHTML = `<div class="card" style="margin-bottom:14px">
+    <h3 style="margin-bottom:4px">Abonados en esta fecha (${holders.length})</h3>
+    <p class="small muted" style="margin-top:0">Las fotos se buscan por dorsal y por selfie. Revisalas y entregá: le llega el link por WhatsApp.${max ? ` Máximo ${max} por fecha.` : ''}</p>
+    ${rows.map((r, i) => `<div class="order" style="grid-template-columns:minmax(0,1fr) auto;align-items:center">
+      <div style="min-width:0"><b>${esc(r.h.buyer_name)}</b><div class="small muted">${r.h.bib ? 'Dorsal ' + esc(r.h.bib) : 'Sin dorsal'}${r.h.selfie_embedding ? ' · 🤳 selfie' : ''} · ${pl(r.ids.length, 'foto encontrada', 'fotos encontradas')}${r.d ? ` · <span style="color:var(--ok);font-weight:700">Entregado (${r.d.photo_ids.length})</span>` : ''}</div></div>
+      <div class="acts">${r.d ? `<button class="btn sm ghost" data-resend="${i}">Reenviar link</button>` : `<button class="btn sm ok" data-deliver="${i}">Revisar y entregar</button>`}</div>
+    </div>`).join('')}</div>`;
+  const send = (h, token, n) => { const link = `${baseUrl()}#/pedido/${token}`; if (h.buyer_phone) window.open(waLink(h.buyer_phone, `Hola ${(h.buyer_name || '').split(' ')[0]}! Ya están tus ${n} fotos de ${ev.title} 📸 Descargalas acá: ${link}`), '_blank'); else copy(link); };
+  $$('[data-resend]', box).forEach(b => b.onclick = () => { const r = rows[+b.dataset.resend]; send(r.h, r.d.token, r.d.photo_ids.length); });
+  $$('[data-deliver]', box).forEach(b => b.onclick = () => {
+    const r = rows[+b.dataset.deliver], chosen = new Set(max ? r.ids.slice(0, max) : r.ids);
+    const others = photos.filter(p => !r.ids.includes(p.id));
+    const m = document.createElement('div'); m.className = 'modal';
+    const grid = list => list.map(p => `<div class="ph ${chosen.has(p.id) ? 'on' : ''}" data-id="${p.id}"><img src="${api.thumb(p)}" alt="" loading="lazy"><span class="sel">${ICON.check}</span></div>`).join('');
+    m.innerHTML = `<div class="sheet" style="max-width:640px">
+      <div class="row" style="margin-bottom:8px"><h3 style="margin:0">Fotos de ${esc(r.h.buyer_name)}</h3><span class="sp"></span><button class="iconbtn" style="background:var(--bg);color:var(--ink)" aria-label="Cerrar">✕</button></div>
+      <p class="small muted" style="margin-top:0">${r.ids.length ? 'Encontradas por dorsal o selfie. Tocá para sacar o agregar.' : 'No encontramos fotos automáticamente. Elegilas de la lista.'}</p>
+      ${r.ids.length ? `<div class="pickgrid">${grid(photos.filter(p => r.ids.includes(p.id)))}</div>` : ''}
+      ${others.length ? `<details style="margin-top:10px" ${r.ids.length ? '' : 'open'}><summary class="small" style="cursor:pointer;font-weight:650">Otras fotos del evento (${others.length})</summary><div class="pickgrid" style="margin-top:8px">${grid(others)}</div></details>` : ''}
+      <div class="row" style="margin-top:12px"><span id="pkN" class="small"></span><span class="sp"></span><button class="btn ok" id="pkGo">Entregar</button></div></div>`;
+    document.body.appendChild(m);
+    const upd = () => { $('#pkN', m).textContent = `${pl(chosen.size, 'foto elegida', 'fotos elegidas')}${max ? ` (máx. ${max})` : ''}`; $('#pkGo', m).disabled = !chosen.size; };
+    m.onclick = async e => {
+      if (e.target === m || e.target.closest('.iconbtn')) return m.remove();
+      const ph = e.target.closest('.ph');
+      if (ph) { const id = ph.dataset.id; if (chosen.has(id)) chosen.delete(id); else if (!max || chosen.size < max) chosen.add(id); else toast(`El pase incluye hasta ${max} fotos por fecha`); ph.classList.toggle('on', chosen.has(id)); upd(); }
+      if (e.target.id === 'pkGo') {
+        e.target.disabled = true;
+        const ids = photos.filter(p => chosen.has(p.id)).map(p => p.id);
+        const token = await api.deliverPass(r.h, ev, ids); m.remove(); send(r.h, token, ids.length); toast('Fotos entregadas'); renderHolders(ev, photos);
+      }
+    };
+    upd();
+  });
+}
+
 async function adminLive(pane) {
   const sch = await api.schedule();
+  if (!pane.isConnected) return;
   pane.innerHTML = `
     <form class="card" id="lvf" style="margin-bottom:14px">
       <h3>Transmisión actual</h3>
@@ -1446,7 +1834,10 @@ async function adminSettings(pane) {
   const s = SET;
   const fld = (k, l, t = 'text', ph = '') => `<label class="f"><span>${l}</span><input type="${t}" name="${k}" value="${esc(s[k] ?? '')}" placeholder="${esc(ph)}" ${t === 'number' ? 'min="0" step="1"' : ''}></label>`;
   pane.innerHTML = `<form class="card" id="stf">
-    <h3>Marca</h3>
+    <h3>Módulos</h3>
+    <p class="small muted" style="margin-top:-4px">Prendé o apagá cada sección de la web.</p>
+    <div class="modrow">${MODULES.map(([k, l]) => `<label class="switch small"><input type="checkbox" name="mod_${k}" ${s['mod_' + k] !== false ? 'checked' : ''}> ${l}</label>`).join('')}</div>
+    <h3 style="margin-top:10px">Marca</h3>
     <div class="brandprev">${s.logo_url ? `<img src="${esc(s.logo_url)}" alt="Logo">` : '<span class="small muted">Sin logo cargado</span>'}
       <label class="btn sm ghost" style="cursor:pointer">Subir logo<input type="file" id="logoF" accept="image/png,image/jpeg,image/webp" hidden></label>
       ${s.logo_url ? '<button type="button" class="btn sm ghost" id="logoX">Quitar</button>' : ''}</div>
@@ -1465,7 +1856,7 @@ async function adminSettings(pane) {
     <div class="grid2">${fld('about_title', 'Título de la sección', 'text', 'Quién soy')}${fld('about_tags', 'Especialidades (separadas por coma)')}</div>
     <label class="f"><span>Presentación (dejá una línea en blanco entre párrafos)</span><textarea name="about_text" rows="7">${esc(s.about_text || '')}</textarea></label>
     <h3 style="margin-top:10px">Chat de ayuda</h3>
-    <label class="f"><span>Preguntas frecuentes: primera línea la pregunta, debajo la respuesta, y una línea en blanco entre cada una. Podés usar {precios}, {alias}, {instagram} y {proxima}.</span><textarea name="faq" rows="12" style="font-size:13.5px">${esc(s.faq || FAQ_DEFAULT)}</textarea></label>
+    <label class="f"><span>Preguntas frecuentes: primera línea la pregunta, debajo la respuesta, y una línea en blanco entre cada una. Podés usar {precios}, {alias}, {instagram}, {proxima} y {pase}.</span><textarea name="faq" rows="12" style="font-size:13.5px">${esc(s.faq || FAQ_DEFAULT)}</textarea></label>
     <h3 style="margin-top:10px">Cobro por transferencia</h3>
     <div class="grid2">${fld('alias', 'Alias')}${fld('cbu', 'CBU / CVU')}</div>
     ${fld('titular', 'Titular de la cuenta')}
@@ -1479,8 +1870,9 @@ async function adminSettings(pane) {
     e.preventDefault(); const f = e.target, o = {};
     ['site_name', 'watermark_text', 'tagline', 'instagram', 'whatsapp', 'youtube', 'alias', 'cbu', 'titular', 'about_title', 'about_tags', 'about_text', 'color_primary', 'color_accent', 'faq'].forEach(k => o[k] = f[k].value.trim() || null);
     o.whatsapp = o.whatsapp ? digits(o.whatsapp) : null;
+    MODULES.forEach(([k]) => o['mod_' + k] = f['mod_' + k].checked);
     ['price_photo', 'pack_size', 'pack_price'].forEach(k => o[k] = f[k].value === '' ? (k === 'price_photo' ? 0 : null) : +f[k].value);
-    SET = { ...SET, ...(await api.saveSettings(o) || o) }; renderChrome(); toast('Ajustes guardados');
+    SET = { ...SET, ...(await api.saveSettings(o) || o) }; renderChrome(); BOT.render(); toast('Ajustes guardados'); viewAdmin();
   };
   // vista previa de colores en vivo
   $$('input[type=color]', pane).forEach(i => i.oninput = () => { SET = { ...SET, [i.name]: i.value }; applyTheme(); });
@@ -1499,11 +1891,15 @@ async function adminSettings(pane) {
 /* =====================================================================
    ROUTER
    ===================================================================== */
+/* Si una carga vieja termina después que una nueva, se vuelve a dibujar la actual */
+let routeSeq = 0, routeDone = 0;
 async function route() {
+  const seq = ++routeSeq;
   const raw = (location.hash || '#/').slice(1);
   const [path, qs] = raw.split('?');
   const parts = path.split('/').filter(Boolean);
   window.scrollTo(0, 0);
+  document.body.classList.remove('has-bar');
   $('#app').innerHTML = '<div class="spin"></div>';
   renderNav(); updateCartUI();
   try {
@@ -1512,13 +1908,18 @@ async function route() {
     else if (parts[0] === 'carrito') await viewCart();
     else if (parts[0] === 'pedido' && parts[1]) await viewOrder(parts[1], /nuevo=1/.test(qs || ''));
     else if (parts[0] === 'vivo') await viewLive();
-    else if (parts[0] === 'quien-soy') await viewAbout();
+    else if (parts[0] === 'quien-soy' && mod('about')) await viewAbout();
+    else if (parts[0] === 'calendario' && mod('calendar')) await viewCalendar();
+    else if (parts[0] === 'pase' && mod('passes')) await viewPassCheckout();
+    else if (parts[0] === 'mi-pase' && parts[1]) await viewMyPass(parts[1], /nuevo=1/.test(qs || ''));
     else if (parts[0] === 'admin') await viewAdmin(parts.slice(1).join('/'));
     else await viewHome();
   } catch (e) {
     console.error(e);
-    $('#app').innerHTML = `<div class="wrap empty"><h2>Algo salió mal</h2><p>${esc(e.message)}</p><a class="btn" href="#/">Volver al inicio</a></div>`;
+    if (seq === routeSeq) $('#app').innerHTML = `<div class="wrap empty"><h2>Algo salió mal</h2><p>${esc(e.message)}</p><a class="btn" href="#/">Volver al inicio</a></div>`;
   }
+  if (seq < routeDone) return route();
+  routeDone = Math.max(routeDone, seq);
   updateCartUI();
   BOT.render();
 }

@@ -58,6 +58,20 @@ Panel → En vivo: tildar "Estoy transmitiendo AHORA" y pegar el link del vivo d
 
 **Librería:** [face-api](https://github.com/vladmandic/face-api) (MIT), alojada en `vendor/face-api/`, sin CDN externa. Solo se descarga cuando alguien usa la búsqueda: el cliente baja unos 7 MB la primera vez y el fotógrafo unos 13 MB. Después quedan en caché.
 
+## Módulos
+
+En **Panel → Ajustes → Módulos** el fotógrafo prende o apaga cada sección: Calendario, Pase de fechas, Chat de ayuda, Búsqueda por selfie, Transmisiones en vivo y Quién soy. Lo que se apaga desaparece de la web, del menú y del panel.
+
+## Calendario y pase de fechas
+
+- **Calendario** (`#/calendario`): muestra los eventos publicados con fecha de hoy en adelante. Los eventos que ya pasaron quedan como galerías en la portada.
+- **Pase:** el cliente marca las fechas a las que va y paga una sola vez por transferencia, con comprobante, igual que un pedido.
+  `Pase = (Σ precio de cada fecha en el pase) × (1 − d)`, con `d` según la escala del fotógrafo (por ejemplo `2:10, 3:15, 4:20`).
+- **Todo se configura en Panel → Pases:** escala de descuentos, precio por fecha por defecto, fotos incluidas (0 = todas), texto de presentación y regla si el abonado no sale en las fotos. En cada evento se carga además el precio de esa fecha dentro del pase, el cupo de abonados y si la fecha entra en el pase.
+- **Entrega:** en cada evento, "Abonados en esta fecha" lista a cada abonado con sus fotos ya encontradas por dorsal o por selfie. Con "Revisar y entregar" se crea un pedido aprobado sin costo y se le manda el link por WhatsApp. El cliente ve todas sus entregas en `#/mi-pase/<token>`.
+- **Datos biométricos:** la selfie del pase se guarda como descriptor (nunca la foto) y solo con consentimiento explícito. La tabla `passes` no tiene lectura pública; el cupo se consulta con la función `pass_counts`, que devuelve solo cantidades.
+- El servidor (`create-pass`) recalcula el precio, valida que las fechas sigan disponibles y controla el cupo.
+
 ## Pendiente
 
 - Lectura automática de dorsales con OCR al subir, para no cargarlos a mano.
